@@ -13,8 +13,11 @@ export type Messages = {
     ctaContact: string;
   };
   about: {
-    body1: string;
-    body2: string;
+    /** 오른쪽 열: 한글 미션 (항상 표시) */
+    missionKo: string;
+    /** 오른쪽 열: 영문 미션 (항상 표시) */
+    missionEn: string;
+    ceoAlt: string;
     close: string;
     closeAria: string;
   };
@@ -72,10 +75,11 @@ const ko: Messages = {
     ctaContact: "지금 문의하기",
   },
   about: {
-    body1:
-      "우리는 디지털 경험을 단순한 화면이 아니라 비즈니스 성장의 도구로 바라봅니다. 브랜드·제품·서비스가 시장에서 의미 있게 자리 잡도록 전략부터 실행까지 함께합니다.",
-    body2:
-      "빠른 실험과 높은 완성도 사이의 균형을 맞추고, 파트너의 목표에 맞춘 로드맵으로 지속 가능한 결과를 만듭니다.",
+    missionKo:
+      "유리온은 유리 코어 기판 기술의 새로운 시대를 열어갈 것이다.",
+    missionEn:
+      "U:RION will usher in a new era of glass core substrate technology.",
+    ceoAlt: "유리온 대표",
     close: "닫기",
     closeAria: "닫기",
   },
@@ -137,10 +141,11 @@ const en: Messages = {
     ctaContact: "Get in touch",
   },
   about: {
-    body1:
-      "We treat digital experiences as tools for business growth—not just screens. From strategy to delivery, we help your brand, product, and services take meaningful positions in the market.",
-    body2:
-      "We balance rapid experimentation with high craft, and build sustainable outcomes through roadmaps aligned with your goals.",
+    missionKo:
+      "유리온은 유리 코어 기판 기술의 새로운 시대를 열어갈 것이다.",
+    missionEn:
+      "U:RION will usher in a new era of glass core substrate technology.",
+    ceoAlt: "U:RION leadership",
     close: "Close",
     closeAria: "Close",
   },
