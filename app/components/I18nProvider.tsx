@@ -8,10 +8,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useRouter } from "next/navigation";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
-import { LOCALE_COOKIE } from "@/lib/i18n/locale";
+import { LOCALE_COOKIE, isLocale } from "@/lib/i18n/locale";
 
 type I18nContextValue = {
   locale: Locale;
@@ -30,21 +29,38 @@ export function I18nProvider({
   children: React.ReactNode;
   initialLocale: Locale;
 }) {
-  const router = useRouter();
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
   useEffect(() => {
-    setLocaleState(initialLocale);
-  }, [initialLocale]);
+    queueMicrotask(() => {
+      if (typeof document === "undefined") return;
+      const m = document.cookie.match(
+        new RegExp(`(?:^|; )${LOCALE_COOKIE}=([^;]*)`),
+      );
+      const raw = m?.[1] ? decodeURIComponent(m[1]) : undefined;
+      if (isLocale(raw)) {
+        setLocaleState(raw);
+        return;
+      }
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.language.toLowerCase().startsWith("en")
+      ) {
+        setLocaleState("en");
+      }
+    });
+  }, []);
 
-  const setLocale = useCallback(
-    (next: Locale) => {
-      document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${COOKIE_MAX_AGE}; samesite=lax`;
-      setLocaleState(next);
-      router.refresh();
-    },
-    [router],
-  );
+  const setLocale = useCallback((next: Locale) => {
+    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${COOKIE_MAX_AGE}; samesite=lax`;
+    setLocaleState(next);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = locale;
+    }
+  }, [locale]);
 
   const t = useMemo(() => getDictionary(locale), [locale]);
 

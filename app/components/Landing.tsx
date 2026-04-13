@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
-import { ABOUT_FROM_INTERNAL_NAV_KEY } from "@/lib/about-nav";
 import { ContactModal } from "./ContactModal";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useI18n } from "./I18nProvider";
@@ -25,14 +24,6 @@ export function Landing() {
             <nav className="flex items-center gap-6 text-sm font-medium sm:gap-8">
               <Link
                 href="/about"
-                scroll={false}
-                onClick={() => {
-                  try {
-                    sessionStorage.setItem(ABOUT_FROM_INTERNAL_NAV_KEY, "1");
-                  } catch {
-                    /* ignore */
-                  }
-                }}
                 className="text-zinc-300 transition-colors hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
               >
                 {t.landing.about}

@@ -42,6 +42,7 @@ export type Messages = {
     err503: string;
     errGeneric: string;
     errNetwork: string;
+    errContactEndpointMissing: string;
   };
   lang: {
     switchKo: string;
@@ -103,6 +104,8 @@ const ko: Messages = {
       "서버에서 문의를 받을 준비가 되어 있지 않습니다. 잠시 후 다시 시도해 주세요.",
     errGeneric: "전송에 실패했습니다. 다시 시도해 주세요.",
     errNetwork: "네트워크 오류가 발생했습니다. 연결을 확인해 주세요.",
+    errContactEndpointMissing:
+      "문의 전송 주소가 설정되지 않았습니다. 배포 환경에 NEXT_PUBLIC_CONTACT_POST_URL을 설정해 주세요.",
   },
   lang: {
     switchKo: "한국어",
@@ -166,6 +169,8 @@ const en: Messages = {
       "We’re not ready to receive inquiries yet. Please try again shortly.",
     errGeneric: "Something went wrong. Please try again.",
     errNetwork: "Network error. Check your connection and try again.",
+    errContactEndpointMissing:
+      "The contact endpoint is not configured. Set NEXT_PUBLIC_CONTACT_POST_URL in your deployment environment.",
   },
   lang: {
     switchKo: "한국어",

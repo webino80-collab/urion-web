@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ABOUT_FROM_INTERNAL_NAV_KEY } from "@/lib/about-nav";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useI18n } from "./I18nProvider";
 
@@ -12,18 +11,8 @@ export function AboutOverlay() {
 
   const close = useCallback(() => {
     if (typeof window === "undefined") return;
-
-    try {
-      if (window.sessionStorage.getItem(ABOUT_FROM_INTERNAL_NAV_KEY) === "1") {
-        window.sessionStorage.removeItem(ABOUT_FROM_INTERNAL_NAV_KEY);
-        router.back();
-        return;
-      }
-    } catch {
-      /* private mode 등 */
-    }
-
-    window.location.assign("/");
+    /** 정적 export·히스토리 한 줄 등에서 `router.back()`이 메인으로 안 갈 수 있어 항상 `/`로 이동 */
+    router.replace("/");
   }, [router]);
 
   useEffect(() => {
