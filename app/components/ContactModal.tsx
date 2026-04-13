@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getPublicContactPostUrl } from "@/lib/contact-endpoint";
+import { getContactPostUrl } from "@/lib/contact-endpoint";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useI18n } from "./I18nProvider";
 
@@ -59,15 +59,8 @@ export function ContactModal({ open, onClose }: ContactModalProps) {
     setFormError(null);
     setFieldErrors({});
 
-    const endpoint = getPublicContactPostUrl();
-    if (!endpoint) {
-      setFormError(t.contact.errContactEndpointMissing);
-      setStatus("error");
-      return;
-    }
-
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch(getContactPostUrl(), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
