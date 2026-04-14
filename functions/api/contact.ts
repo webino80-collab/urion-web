@@ -1,6 +1,7 @@
 /**
  * Cloudflare Pages Function — POST /api/contact
- * Resend: RESEND_API_KEY, CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL (Pages 환경 변수)
+ * Resend: RESEND_API_KEY, CONTACT_FROM_EMAIL 필수.
+ * 수신: CONTACT_TO_EMAIL (없으면 DEFAULT_CONTACT_TO_EMAIL).
  * 또는 CONTACT_WEBHOOK_URL 단독 사용.
  */
 
@@ -11,6 +12,16 @@ interface Env {
   CONTACT_FROM_EMAIL?: string;
   CONTACT_TO_EMAIL?: string;
   CONTACT_WEBHOOK_URL?: string;
+}
+
+/** CONTACT_TO_EMAIL 미설정 시 사용. 환경 변수가 있으면 항상 그 값(쉼표 구분)을 사용합니다. */
+const DEFAULT_CONTACT_TO_EMAIL = "daecheol.bang@uri-on.com";
+
+function resolvedContactToList(env: Env): string[] {
+  const raw = env.CONTACT_TO_EMAIL?.trim();
+  const csv = raw || DEFAULT_CONTACT_TO_EMAIL;
+  const list = csv.split(",").map((s) => s.trim()).filter(Boolean);
+  return list.length > 0 ? list : [DEFAULT_CONTACT_TO_EMAIL];
 }
 
 function escapeHtml(s: string) {
@@ -31,21 +42,21 @@ const apiText = {
     invalidJson: "요청 본문이 올바르지 않습니다.",
     validationSummary: "입력값을 확인해 주세요.",
     resendMisconfigured:
-      "RESEND_API_KEY는 설정되어 있으나 CONTACT_FROM_EMAIL 또는 CONTACT_TO_EMAIL이 없습니다.",
+      "RESEND_API_KEY는 설정되어 있으나 CONTACT_FROM_EMAIL이 없습니다.",
     emailSendFailed:
       "메일 전송에 실패했습니다. 발신 도메인·API 키 권한을 확인하거나 잠시 후 다시 시도해 주세요.",
     notConfigured:
-      "문의 메일을 받으려면 Resend(RESEND_API_KEY, CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL) 또는 CONTACT_WEBHOOK_URL을 Pages 환경 변수로 설정하세요.",
+      "문의 메일을 받으려면 Resend(RESEND_API_KEY, CONTACT_FROM_EMAIL, 선택: CONTACT_TO_EMAIL) 또는 CONTACT_WEBHOOK_URL을 Pages 환경 변수로 설정하세요.",
   },
   en: {
     invalidJson: "Invalid request body.",
     validationSummary: "Please check the highlighted fields.",
     resendMisconfigured:
-      "RESEND_API_KEY is set but CONTACT_FROM_EMAIL or CONTACT_TO_EMAIL is missing.",
+      "RESEND_API_KEY is set but CONTACT_FROM_EMAIL is missing.",
     emailSendFailed:
       "Failed to send email. Check your domain, API key permissions, or try again later.",
     notConfigured:
-      "Configure Resend (RESEND_API_KEY, CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL) or CONTACT_WEBHOOK_URL in Pages environment variables.",
+      "Configure Resend (RESEND_API_KEY, CONTACT_FROM_EMAIL, optional: CONTACT_TO_EMAIL) or CONTACT_WEBHOOK_URL in Pages environment variables.",
   },
 } as const;
 
@@ -108,15 +119,12 @@ function json(data: unknown, status = 200) {
 function hasResendKeyIncompleteFromTo(env: Env) {
   const key = env.RESEND_API_KEY?.trim();
   const from = env.CONTACT_FROM_EMAIL?.trim();
-  const to = env.CONTACT_TO_EMAIL?.trim();
-  return Boolean(key) && (!from || !to);
+  return Boolean(key) && !from;
 }
 
 function isResendReady(env: Env) {
   return Boolean(
-    env.RESEND_API_KEY?.trim() &&
-      env.CONTACT_FROM_EMAIL?.trim() &&
-      env.CONTACT_TO_EMAIL?.trim(),
+    env.RESEND_API_KEY?.trim() && env.CONTACT_FROM_EMAIL?.trim(),
   );
 }
 
@@ -165,9 +173,7 @@ export async function onRequestPost(context: {
 
   if (isResendReady(env)) {
     const from = env.CONTACT_FROM_EMAIL!.trim();
-    const toList = env.CONTACT_TO_EMAIL!.split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const toList = resolvedContactToList(env);
     const subject =
       loc === "ko"
         ? `[U:RION 문의] ${payload.name}`
