@@ -1,6 +1,7 @@
 /**
  * Cloudflare Pages Function — POST /api/contact
- * 대시보드(Environment variables)에 RESEND 또는 웹훅을 설정하세요.
+ * Resend: RESEND_API_KEY, CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL (Pages 환경 변수)
+ * 또는 CONTACT_WEBHOOK_URL 단독 사용.
  */
 
 type Locale = "ko" | "en";
@@ -163,7 +164,10 @@ export async function onRequestPost(context: {
   }
 
   if (isResendReady(env)) {
-    const toList = env.CONTACT_TO_EMAIL!.split(",").map((s) => s.trim()).filter(Boolean);
+    const from = env.CONTACT_FROM_EMAIL!.trim();
+    const toList = env.CONTACT_TO_EMAIL!.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     const subject =
       loc === "ko"
         ? `[U:RION 문의] ${payload.name}`
@@ -182,7 +186,7 @@ export async function onRequestPost(context: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: env.CONTACT_FROM_EMAIL,
+        from,
         to: toList,
         reply_to: payload.email,
         subject,
@@ -190,11 +194,18 @@ export async function onRequestPost(context: {
       }),
     });
 
-    const resBody = (await res.json().catch(() => ({}))) as { id?: string };
+    const raw = await res.text();
+    let resBody: { id?: string } = {};
+    try {
+      resBody = JSON.parse(raw) as { id?: string };
+    } catch {
+      /* ignore */
+    }
 
     if (res.ok) {
       return json({ ok: true, channel: "email", id: resBody.id });
     }
+    console.error("[contact] Resend error", res.status, raw);
     return json(
       { error: { code: "EMAIL_SEND_FAILED", message: T.emailSendFailed } },
       502,
