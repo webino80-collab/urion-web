@@ -5,8 +5,7 @@
   "scripts": {
     "hero:sync": "node scripts/sync-hero-from-public.mjs",
     "dev": "next dev",
-    "build": "next build",
-    "postbuild": "node -e \"const fs=require('fs'); try{fs.rmSync('dist',{recursive:true,force:true});}catch(e){} if(!fs.existsSync('out')){console.error('postbuild: missing out/ — run next build first'); process.exit(1);} fs.cpSync('out','dist',{recursive:true});\"",
+    "build": "next build && node -e \"const fs=require('fs'); try{fs.rmSync('dist',{recursive:true,force:true});}catch(e){} if(!fs.existsSync('out')){console.error('build: next build 후 out/ 가 없습니다'); process.exit(1);} fs.cpSync('out','dist',{recursive:true}); console.log('build: out/ → dist/ 복사 완료');\"",
     "start": "next start",
     "lint": "eslint"
   },
