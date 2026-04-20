@@ -345,7 +345,6 @@ export default function AdminHeroPage() {
                         src={s.url}
                         className="h-full w-full object-cover"
                         muted
-                        defaultMuted
                         playsInline
                         preload="metadata"
                         onLoadedMetadata={(e) => {

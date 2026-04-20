@@ -54,7 +54,6 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
           muted
           playsInline
           autoPlay
-          defaultMuted
           onLoadedMetadata={(e) => {
             e.currentTarget.muted = true;
             e.currentTarget.volume = 0;
