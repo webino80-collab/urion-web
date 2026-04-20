@@ -1,20 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import { fetchHeroSlides } from "@/lib/hero-fetch";
 import type { HeroSlide } from "@/lib/hero-types";
-import { ContactModal } from "./ContactModal";
 import { HeroBackdrop } from "./HeroBackdrop";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useI18n } from "./I18nProvider";
 
 export function Landing() {
-  const { locale, t } = useI18n();
-  const [contactOpen, setContactOpen] = useState(false);
+  const { t } = useI18n();
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
-  const openContact = useCallback(() => setContactOpen(true), []);
-  const closeContact = useCallback(() => setContactOpen(false), []);
 
   useEffect(() => {
     const ac = new AbortController();
@@ -22,6 +18,23 @@ export function Landing() {
       if (!ac.signal.aborted) setHeroSlides(slides);
     });
     return () => ac.abort();
+  }, []);
+
+  /** 레거시: Spline 워터마크 가림용 하단 좌·우 검은 박스(div)가 DOM에 남아 있으면 제거 */
+  useLayoutEffect(() => {
+    for (const el of document.querySelectorAll('div[aria-hidden="true"]')) {
+      if (el.childElementCount !== 0) continue;
+      const cls = el.getAttribute("class") ?? "";
+      if (!cls.includes("fixed") || !cls.includes("bottom-0")) continue;
+      const cs = getComputedStyle(el);
+      if (cs.position !== "fixed") continue;
+      const r = el.getBoundingClientRect();
+      if (r.height < 50 || r.height > 160 || r.width < 200 || r.width > 520) continue;
+      const bg = cs.backgroundColor;
+      if (bg === "rgb(0, 0, 0)" || bg === "rgba(0, 0, 0, 1)") {
+        el.remove();
+      }
+    }
   }, []);
 
   return (
@@ -41,6 +54,7 @@ export function Landing() {
               >
                 {t.landing.about}
               </Link>
+              {/* 헤더 문의하기 — 비표시
               <button
                 type="button"
                 onClick={openContact}
@@ -48,12 +62,14 @@ export function Landing() {
               >
                 {t.landing.contactUs}
               </button>
+              */}
             </nav>
           </div>
         </header>
 
         <main className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6 pb-24 pt-2 sm:px-10 sm:pb-28">
           <div className="mx-auto max-w-4xl text-center">
+            {/* 히어로 카피·설명·메인 문의 CTA — 비표시
             <h1 className="bg-gradient-to-br from-white via-zinc-100 to-zinc-500 bg-clip-text text-5xl font-extrabold leading-[1.05] tracking-tight text-transparent sm:text-6xl md:text-7xl lg:text-8xl">
               {t.landing.heroLine1}
               <br />
@@ -81,6 +97,7 @@ export function Landing() {
                 {t.landing.ctaContact}
               </button>
             </div>
+            */}
           </div>
         </main>
 
@@ -93,7 +110,9 @@ export function Landing() {
         </p>
       </footer>
 
+      {/* 문의 모달 — 헤더/메인 문의 버튼 비표시로 열 수 없음
       <ContactModal open={contactOpen} onClose={closeContact} />
+      */}
     </>
   );
 }
