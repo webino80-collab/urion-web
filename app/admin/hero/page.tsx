@@ -345,8 +345,13 @@ export default function AdminHeroPage() {
                         src={s.url}
                         className="h-full w-full object-cover"
                         muted
+                        defaultMuted
                         playsInline
                         preload="metadata"
+                        onLoadedMetadata={(e) => {
+                          e.currentTarget.muted = true;
+                          e.currentTarget.volume = 0;
+                        }}
                       />
                     ) : (
                       // eslint-disable-next-line @next/next/no-img-element

@@ -46,6 +46,7 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
     >
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/65" />
       {slide.kind === "video" ? (
+        // 배경 영상은 항상 무음 (autoplay 정책 대응)
         <video
           key={slide.id}
           className="absolute inset-0 h-full w-full scale-105 object-cover opacity-90"
@@ -53,6 +54,19 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
           muted
           playsInline
           autoPlay
+          defaultMuted
+          onLoadedMetadata={(e) => {
+            e.currentTarget.muted = true;
+            e.currentTarget.volume = 0;
+          }}
+          onPlay={(e) => {
+            e.currentTarget.muted = true;
+            e.currentTarget.volume = 0;
+          }}
+          onVolumeChange={(e) => {
+            e.currentTarget.muted = true;
+            e.currentTarget.volume = 0;
+          }}
           onEnded={() => {
             if (count > 1) goNext();
           }}
