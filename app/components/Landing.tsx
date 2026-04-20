@@ -1,20 +1,33 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { fetchHeroSlides } from "@/lib/hero-fetch";
+import type { HeroSlide } from "@/lib/hero-types";
 import { ContactModal } from "./ContactModal";
+import { HeroBackdrop } from "./HeroBackdrop";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useI18n } from "./I18nProvider";
 
 export function Landing() {
   const { locale, t } = useI18n();
   const [contactOpen, setContactOpen] = useState(false);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
   const openContact = useCallback(() => setContactOpen(true), []);
   const closeContact = useCallback(() => setContactOpen(false), []);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    fetchHeroSlides(ac.signal).then(({ slides }) => {
+      if (!ac.signal.aborted) setHeroSlides(slides);
+    });
+    return () => ac.abort();
+  }, []);
 
   return (
     <>
       <div className="relative z-20 isolate flex h-screen min-h-0 flex-col overflow-hidden bg-transparent text-zinc-100">
+        <HeroBackdrop slides={heroSlides} />
         <header className="relative z-10 flex shrink-0 items-center justify-between gap-4 px-6 py-5 sm:px-10">
           <span className="text-sm font-bold tracking-[0.2em] text-zinc-400">
             U:RION
