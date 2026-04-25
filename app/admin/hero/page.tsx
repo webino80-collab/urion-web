@@ -257,7 +257,7 @@ export default function AdminHeroPage() {
           </div>
           <Link
             href="/"
-            className="text-sm text-violet-400 hover:text-violet-300"
+            className="inline-flex min-h-12 items-center text-sm text-violet-400 hover:text-violet-300"
           >
             ← 사이트로
           </Link>
@@ -272,7 +272,7 @@ export default function AdminHeroPage() {
             <button
               type="button"
               onClick={() => void loadSlides()}
-              className="rounded-lg border border-white/15 px-3 py-1.5 text-sm text-zinc-200 hover:bg-white/5"
+              className="inline-flex min-h-12 items-center rounded-lg border border-white/15 px-4 py-2 text-sm text-zinc-200 hover:bg-white/5"
             >
               새로고침
             </button>
@@ -289,7 +289,7 @@ export default function AdminHeroPage() {
               value={secret}
               onChange={(e) => persistSecret(e.target.value)}
               autoComplete="off"
-              className="mt-1.5 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none ring-violet-500/40 focus:ring-2"
+              className="mt-1.5 box-border min-h-12 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm leading-normal outline-none ring-violet-500/40 focus:ring-2"
               placeholder="Bearer 토큰과 동일한 값"
             />
           </label>
@@ -309,7 +309,7 @@ export default function AdminHeroPage() {
                   e.target.value = "";
                   if (f) void uploadFile(f);
                 }}
-                className="mt-2 block w-full text-sm text-zinc-400 file:mr-3 file:rounded-md file:border-0 file:bg-violet-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-violet-500"
+                className="mt-2 box-border block min-h-12 w-full text-sm leading-normal text-zinc-400 file:mr-3 file:inline-flex file:h-12 file:items-center file:rounded-md file:border-0 file:bg-violet-600 file:px-4 file:text-sm file:font-medium file:text-white hover:file:bg-violet-500"
               />
             </div>
             <div>
@@ -322,13 +322,13 @@ export default function AdminHeroPage() {
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   placeholder="https://…/banner.webp"
-                  className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none ring-violet-500/40 focus:ring-2"
+                  className="box-border min-h-12 min-w-0 flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm leading-normal outline-none ring-violet-500/40 focus:ring-2"
                 />
                 <button
                   type="button"
                   onClick={addByUrl}
                   disabled={busy}
-                  className="shrink-0 rounded-lg bg-violet-600 px-3 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+                  className="inline-flex min-h-12 shrink-0 items-center rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
                 >
                   추가
                 </button>
@@ -378,7 +378,7 @@ export default function AdminHeroPage() {
                       {s.url}
                     </p>
                     {s.kind === "video" && s.mobileUrl ? (
-                      <p className="mt-0.5 truncate font-mono text-[11px] text-zinc-500">
+                      <p className="mt-0.5 truncate font-mono text-xs text-zinc-500">
                         모바일: {s.mobileUrl}
                       </p>
                     ) : null}
@@ -388,7 +388,7 @@ export default function AdminHeroPage() {
                       type="button"
                       disabled={busy || i === 0}
                       onClick={() => move(i, -1)}
-                      className="rounded border border-white/10 px-2 py-1 text-xs hover:bg-white/5 disabled:opacity-30"
+                      className="inline-flex min-h-12 items-center rounded border border-white/10 px-3 text-xs hover:bg-white/5 disabled:opacity-30"
                     >
                       위로
                     </button>
@@ -396,7 +396,7 @@ export default function AdminHeroPage() {
                       type="button"
                       disabled={busy || i === slides.length - 1}
                       onClick={() => move(i, 1)}
-                      className="rounded border border-white/10 px-2 py-1 text-xs hover:bg-white/5 disabled:opacity-30"
+                      className="inline-flex min-h-12 items-center rounded border border-white/10 px-3 text-xs hover:bg-white/5 disabled:opacity-30"
                     >
                       아래로
                     </button>
@@ -404,7 +404,7 @@ export default function AdminHeroPage() {
                       type="button"
                       disabled={busy}
                       onClick={() => removeAt(i)}
-                      className="rounded border border-red-500/30 px-2 py-1 text-xs text-red-300 hover:bg-red-500/10"
+                      className="inline-flex min-h-12 items-center rounded border border-red-500/30 px-3 text-xs text-red-300 hover:bg-red-500/10"
                     >
                       삭제
                     </button>
@@ -419,7 +419,7 @@ export default function AdminHeroPage() {
               type="button"
               disabled={busy}
               onClick={() => void saveSlides()}
-              className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 disabled:opacity-50"
+              className="inline-flex min-h-12 items-center rounded-full bg-white px-6 py-2 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 disabled:opacity-50"
             >
               {busy ? "처리 중…" : "서버에 저장 (KV)"}
             </button>
@@ -427,7 +427,7 @@ export default function AdminHeroPage() {
               type="button"
               disabled={busy}
               onClick={downloadJson}
-              className="rounded-full border border-white/20 px-6 py-2.5 text-sm font-medium text-zinc-200 hover:bg-white/5"
+              className="inline-flex min-h-12 items-center rounded-full border border-white/20 px-6 py-2 text-sm font-medium text-zinc-200 hover:bg-white/5"
             >
               JSON 내려받기
             </button>

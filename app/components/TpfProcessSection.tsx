@@ -31,10 +31,10 @@ function titleStartsWithPre(text: string) {
 }
 
 const tpfDiscListCore =
-  "list-outside list-disc space-y-4 pl-5 text-left text-[16px] font-normal leading-relaxed break-keep text-white marker:text-white sm:space-y-5 sm:pl-5 [&>li]:pl-0.5";
+  "list-outside list-disc space-y-4 pl-5 text-left text-[18px] font-normal leading-[1.6] break-keep text-white marker:text-white sm:space-y-5 sm:pl-5 [&>li]:pl-0.5";
 
 const tpfNumberedSublistCoreClass =
-  "list-decimal space-y-1.5 pl-5 text-left text-[14px] font-normal leading-[1.3125] break-keep text-zinc-400 marker:text-zinc-500 sm:space-y-2 sm:pl-5";
+  "list-decimal space-y-1.5 pl-5 text-left text-[18px] font-normal leading-[1.6] break-keep text-zinc-400 marker:text-zinc-500 sm:space-y-2 sm:pl-5";
 
 const tpfNumberedSublistClass =
   `mt-2.5 sm:mt-3 ${tpfNumberedSublistCoreClass}`;
@@ -131,7 +131,7 @@ function TpfAdvantagesContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
               {mobile && hasSubs ? (
                 <button
                   type="button"
-                  className="flex w-full items-start justify-between gap-3 rounded-sm py-1 text-left text-[16px] font-normal leading-relaxed text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
+                  className="flex min-h-12 w-full items-start justify-between gap-3 rounded-sm py-2 text-left text-[18px] font-normal leading-[1.6] text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
                   aria-expanded={expanded}
                   aria-controls={subId}
                   onClick={() =>
@@ -142,14 +142,14 @@ function TpfAdvantagesContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
                     {item.heading}
                   </span>
                   <span
-                    className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-lg font-semibold leading-none text-zinc-200 tabular-nums"
+                    className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-sm text-lg font-semibold leading-none text-zinc-200 tabular-nums"
                     aria-hidden
                   >
                     {expanded ? "−" : "+"}
                   </span>
                 </button>
               ) : (
-                <p className="whitespace-pre-line text-[16px] font-normal leading-relaxed text-white">
+                <p className="whitespace-pre-line text-[18px] font-normal leading-[1.6] text-white">
                   {item.heading}
                 </p>
               )}

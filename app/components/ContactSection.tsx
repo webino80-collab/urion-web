@@ -116,11 +116,11 @@ export function ContactSection({
                 type="button"
                 onClick={onClose}
                 disabled={status === "loading"}
-                className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 disabled:pointer-events-none disabled:opacity-40"
+                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 disabled:pointer-events-none disabled:opacity-40"
                 aria-label={t.contact.closeAria}
               >
                 <svg
-                  className="h-5 w-5"
+                  className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -151,7 +151,7 @@ export function ContactSection({
               resetForm();
               if (embedded) onClose?.();
             }}
-            className="mt-8 w-full max-w-sm rounded-[10px] border border-white/15 bg-white/5 py-3 text-base font-semibold text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+            className="mt-8 inline-flex min-h-12 w-full max-w-sm items-center justify-center rounded-[10px] border border-white/15 bg-white/5 px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
           >
             {t.contact.close}
           </button>
@@ -174,7 +174,7 @@ export function ContactSection({
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center justify-center rounded-full border border-violet-400/55 bg-transparent px-3.5 py-1.5 text-[10px] font-medium leading-none tracking-wide text-violet-300 transition-[color,border-color,box-shadow] hover:border-violet-300 hover:text-violet-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                  className="mt-4 inline-flex min-h-12 items-center justify-center rounded-full border border-violet-400/55 bg-transparent px-4 py-2 text-base font-medium leading-normal tracking-wide text-violet-300 transition-[color,border-color,box-shadow] hover:border-violet-300 hover:text-violet-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                 >
                   {t.contact.mapLink}
                 </a>
@@ -217,7 +217,7 @@ export function ContactSection({
                   aria-describedby={
                     fieldErrors.name?.length ? `${idp}-name-error` : undefined
                   }
-                  className="w-full rounded-[10px] border border-white/10 bg-zinc-900/80 px-4 py-3 text-base text-white placeholder:text-zinc-600 outline-none transition-[border-color,box-shadow] focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/25 disabled:opacity-50"
+                  className="box-border min-h-12 w-full rounded-[10px] border border-white/10 bg-zinc-900/80 px-4 py-3 text-base leading-normal text-white placeholder:text-zinc-600 outline-none transition-[border-color,box-shadow] focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/25 disabled:opacity-50"
                     placeholder={t.contact.placeholderName}
                 />
                 {fieldErrors.name?.[0] ? (
@@ -249,7 +249,7 @@ export function ContactSection({
                   aria-describedby={
                     fieldErrors.email?.length ? `${idp}-email-error` : undefined
                   }
-                  className="w-full rounded-[10px] border border-white/10 bg-zinc-900/80 px-4 py-3 text-base text-white placeholder:text-zinc-600 outline-none transition-[border-color,box-shadow] focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/25 disabled:opacity-50"
+                  className="box-border min-h-12 w-full rounded-[10px] border border-white/10 bg-zinc-900/80 px-4 py-3 text-base leading-normal text-white placeholder:text-zinc-600 outline-none transition-[border-color,box-shadow] focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/25 disabled:opacity-50"
                     placeholder={t.contact.placeholderEmail}
                 />
                 {fieldErrors.email?.[0] ? (
@@ -282,7 +282,7 @@ export function ContactSection({
                       ? `${idp}-message-error`
                       : undefined
                   }
-                  className="w-full resize-none rounded-[10px] border border-white/10 bg-zinc-900/80 px-4 py-3 text-base text-white placeholder:text-zinc-600 outline-none transition-[border-color,box-shadow] focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/25 disabled:opacity-50"
+                  className="box-border min-h-[12rem] w-full resize-none rounded-[10px] border border-white/10 bg-zinc-900/80 px-4 py-3 text-base leading-normal text-white placeholder:text-zinc-600 outline-none transition-[border-color,box-shadow] focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/25 disabled:opacity-50"
                     placeholder={t.contact.placeholderMessage}
                 />
                 {fieldErrors.message?.[0] ? (
@@ -297,7 +297,7 @@ export function ContactSection({
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="mt-2 rounded-[10px] bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-violet-950/40 transition-[filter,transform] hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:pointer-events-none disabled:opacity-60"
+                className="mt-2 inline-flex min-h-12 w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-base font-semibold leading-normal text-white shadow-lg shadow-violet-950/40 transition-[filter,transform] hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:pointer-events-none disabled:opacity-60"
               >
                 {status === "loading" ? t.contact.submitting : t.contact.submit}
               </button>

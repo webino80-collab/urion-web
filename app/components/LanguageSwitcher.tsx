@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => select("ko")}
-        className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 sm:px-3 sm:text-sm ${
+        className={`inline-flex min-h-12 items-center rounded-full px-3 py-2 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 sm:px-4 ${
           locale === "ko"
             ? "bg-white/15 text-white"
             : "text-zinc-500 hover:text-zinc-300"
@@ -31,7 +31,7 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => select("en")}
-        className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 sm:px-3 sm:text-sm ${
+        className={`inline-flex min-h-12 items-center rounded-full px-3 py-2 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 sm:px-4 ${
           locale === "en"
             ? "bg-white/15 text-white"
             : "text-zinc-500 hover:text-zinc-300"

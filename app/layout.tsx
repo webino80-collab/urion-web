@@ -13,8 +13,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   /** 정적 HTML 기본값. 실제 표시 언어는 I18nProvider가 쿠키·브라우저에서 복원 */
   const initialLocale = "ko" as const;
@@ -25,7 +27,10 @@ export default function RootLayout({
       className="min-h-dvh overflow-x-hidden font-sans antialiased"
     >
       <body className="min-h-dvh overflow-x-hidden bg-black text-zinc-100 antialiased">
-        <I18nProvider initialLocale={initialLocale}>{children}</I18nProvider>
+        <I18nProvider initialLocale={initialLocale}>
+          {children}
+          {modal}
+        </I18nProvider>
       </body>
     </html>
   );

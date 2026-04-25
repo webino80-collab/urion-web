@@ -52,11 +52,11 @@ export function AboutOverlay() {
             <button
               type="button"
               onClick={close}
-              className="shrink-0 rounded-lg p-2 text-zinc-500 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80"
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80"
               aria-label={t.about.closeAria}
             >
               <svg
-                className="h-5 w-5"
+                className="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -87,12 +87,12 @@ export function AboutOverlay() {
           </div>
 
           <div className="min-w-0 pt-2 text-left lg:pt-10">
-            <p className="text-sm leading-relaxed text-zinc-400 sm:text-base">
+            <p className="text-base leading-relaxed text-zinc-400 sm:text-base">
               {t.about.missionKoBefore}
               <span className="text-white">{t.about.missionKoHighlight}</span>
               {t.about.missionKoAfter}
             </p>
-            <p className="mt-4 text-sm leading-relaxed text-zinc-400 sm:text-base">
+            <p className="mt-4 text-base leading-relaxed text-zinc-400 sm:text-base">
               {t.about.missionEn}
             </p>
           </div>

@@ -283,7 +283,7 @@ export function Landing() {
         <button
           type="button"
           onClick={goHome}
-          className="cursor-pointer text-left text-sm font-bold tracking-[0.2em] text-zinc-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="inline-flex min-h-12 cursor-pointer items-center px-2 text-left text-sm font-bold tracking-[0.2em] text-zinc-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           aria-label={t.landing.logoHomeAria}
         >
           U:RION
@@ -298,14 +298,14 @@ export function Landing() {
           >
             <Link
               href="/about"
-              className="text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
+              className="inline-flex min-h-12 items-center px-2 text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:text-white focus-visible:underline"
             >
               {t.landing.about}
             </Link>
             <button
               type="button"
               onClick={goToContactSlide}
-              className="rounded-sm text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className="inline-flex min-h-12 items-center rounded-sm px-2 text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
               {t.landing.contactUs}
             </button>
@@ -313,14 +313,14 @@ export function Landing() {
 
           <button
             type="button"
-            className="flex h-10 w-10 shrink-0 items-center justify-center text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:text-white focus-visible:ring-2 focus-visible:ring-violet-500/60 sm:hidden"
+            className="flex h-12 w-12 shrink-0 items-center justify-center text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:text-white focus-visible:ring-2 focus-visible:ring-violet-500/60 sm:hidden"
             aria-expanded={mobileMenuOpen}
             aria-controls="landing-mobile-nav"
             aria-label={t.landing.openMenuAria}
             onClick={() => setMobileMenuOpen(true)}
           >
             <svg
-              className="h-5 w-5"
+              className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -445,11 +445,11 @@ export function Landing() {
               <button
                 type="button"
                 onClick={closeMobileMenu}
-                className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80"
+                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80"
                 aria-label={t.about.closeAria}
               >
                 <svg
-                  className="h-5 w-5"
+                  className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -468,7 +468,7 @@ export function Landing() {
               <li>
                 <Link
                   href="/about"
-                  className="block rounded-2xl px-4 py-4 text-lg font-medium tracking-tight text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 active:bg-white/5"
+                  className="flex min-h-12 items-center rounded-2xl px-4 py-4 text-lg font-medium leading-normal tracking-tight text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 active:bg-white/5"
                   onClick={closeMobileMenu}
                 >
                   {t.landing.about}
@@ -477,7 +477,7 @@ export function Landing() {
               <li>
                 <button
                   type="button"
-                  className="w-full rounded-2xl px-4 py-4 text-left text-lg font-medium tracking-tight text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 active:bg-white/5"
+                  className="flex min-h-12 w-full items-center rounded-2xl px-4 py-4 text-left text-lg font-medium leading-normal tracking-tight text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 active:bg-white/5"
                   onClick={goToContactSlide}
                 >
                   {t.landing.contactUs}
