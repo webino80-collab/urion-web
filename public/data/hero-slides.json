@@ -2,13 +2,9 @@
   "version": 1,
   "slides": [
     {
-      "id": "hero01",
-      "url": "/hero01.mp4",
-      "kind": "video"
-    },
-    {
-      "id": "hero02",
-      "url": "/hero02.mp4",
+      "id": "hero",
+      "url": "/hero.mp4",
+      "mobileUrl": "/mobile_hero.mp4",
       "kind": "video"
     }
   ]

@@ -1,5 +1,5 @@
 import type { HeroConfig, HeroSlide } from "./hero-types";
-import { inferHeroKind } from "./hero-types";
+import { inferHeroKind, normalizeHeroMobileUrl } from "./hero-types";
 
 function normalizeSlides(raw: unknown): HeroSlide[] {
   if (!Array.isArray(raw)) return [];
@@ -17,7 +17,8 @@ function normalizeSlides(raw: unknown): HeroSlide[] {
       o.kind === "video" || o.kind === "image"
         ? o.kind
         : inferHeroKind(url);
-    out.push({ id, url, kind });
+    const mobileUrl = normalizeHeroMobileUrl(o.mobileUrl, kind);
+    out.push({ id, url, kind, ...(mobileUrl ? { mobileUrl } : {}) });
   }
   return out;
 }

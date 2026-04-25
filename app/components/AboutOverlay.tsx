@@ -3,12 +3,12 @@
 import { useCallback, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { LanguageSwitcher } from "./LanguageSwitcher";
+// import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useI18n } from "./I18nProvider";
 
 export function AboutOverlay() {
   const router = useRouter();
-  const { locale, t } = useI18n();
+  const { t } = useI18n();
 
   const close = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -42,19 +42,13 @@ export function AboutOverlay() {
             id="about-overlay-title"
             className="min-w-0 flex-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
           >
-            {locale === "ko" ? (
-              <>
-                <span className="font-bold">U:RION</span>
-                {" 소개"}
-              </>
-            ) : (
-              <>
-                About <span className="font-bold">U:RION</span>
-              </>
-            )}
+            <span className="font-bold">U:RION</span>
+            <span className="text-zinc-300"> CEO</span>
           </h1>
           <div className="flex shrink-0 items-center gap-2">
+            {/* 언어 토글 (한국어 / English) — 필요 시 위 LanguageSwitcher import 주석 해제 후 아래 주석 해제
             <LanguageSwitcher />
+            */}
             <button
               type="button"
               onClick={close}
@@ -94,7 +88,9 @@ export function AboutOverlay() {
 
           <div className="min-w-0 pt-2 text-left lg:pt-10">
             <p className="text-sm leading-relaxed text-zinc-400 sm:text-base">
-              {t.about.missionKo}
+              {t.about.missionKoBefore}
+              <span className="text-white">{t.about.missionKoHighlight}</span>
+              {t.about.missionKoAfter}
             </p>
             <p className="mt-4 text-sm leading-relaxed text-zinc-400 sm:text-base">
               {t.about.missionEn}

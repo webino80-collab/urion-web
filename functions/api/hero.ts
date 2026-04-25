@@ -16,6 +16,7 @@ type Slide = {
   id: string;
   url: string;
   kind: SlideKind;
+  mobileUrl?: string;
 };
 
 interface HeroEnv {
@@ -73,7 +74,16 @@ function normalizeSlideInput(item: unknown): Slide | null {
     o.kind === "video" || o.kind === "image" ? o.kind : inferKind(url);
   const ext = extFromUrl(url);
   if (!ALLOWED_EXT.has(ext)) return null;
-  return { id, url, kind };
+  let mobileUrl: string | undefined;
+  const rawMobile =
+    typeof o.mobileUrl === "string" ? o.mobileUrl.trim() : "";
+  if (kind === "video" && rawMobile) {
+    const extM = extFromUrl(rawMobile);
+    if (isValidSlideUrl(rawMobile) && ALLOWED_EXT.has(extM)) {
+      mobileUrl = rawMobile;
+    }
+  }
+  return mobileUrl ? { id, url, kind, mobileUrl } : { id, url, kind };
 }
 
 function parseSlidesBody(body: unknown): Slide[] | null {

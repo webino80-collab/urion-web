@@ -4,6 +4,8 @@ export type HeroSlide = {
   id: string;
   url: string;
   kind: HeroSlideKind;
+  /** kind가 video일 때, 좁은 뷰포트에서 재생할 별도 영상 (예: 세로·저해상도) */
+  mobileUrl?: string;
 };
 
 export type HeroConfig = {
@@ -37,6 +39,17 @@ export function extFromUrlOrPath(url: string): string {
 
 export function inferHeroKind(url: string): HeroSlideKind {
   return VIDEO_EXT.has(extFromUrlOrPath(url)) ? "video" : "image";
+}
+
+/** JSON/API에서 온 mobileUrl 문자열을 검증해 슬라이드에 넣을 값으로 정규화 */
+export function normalizeHeroMobileUrl(
+  raw: unknown,
+  slideKind: HeroSlideKind,
+): string | undefined {
+  if (slideKind !== "video") return undefined;
+  const mobile = typeof raw === "string" ? raw.trim() : "";
+  if (!mobile || inferHeroKind(mobile) !== "video") return undefined;
+  return mobile;
 }
 
 export function isAllowedHeroExtension(ext: string): ext is HeroAllowedExt {

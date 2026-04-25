@@ -9,6 +9,7 @@ import {
   extFromUrlOrPath,
   inferHeroKind,
   isAllowedHeroExtension,
+  normalizeHeroMobileUrl,
 } from "@/lib/hero-types";
 
 const SECRET_KEY = "urion_hero_admin_secret";
@@ -31,7 +32,14 @@ function normalizeRemoteSlides(raw: unknown): HeroSlide[] {
       o.kind === "video" || o.kind === "image"
         ? o.kind
         : inferHeroKind(url);
-    out.push({ id, url, kind });
+    let mobileUrl = normalizeHeroMobileUrl(o.mobileUrl, kind);
+    if (
+      mobileUrl &&
+      !isAllowedHeroExtension(extFromUrlOrPath(mobileUrl))
+    ) {
+      mobileUrl = undefined;
+    }
+    out.push({ id, url, kind, ...(mobileUrl ? { mobileUrl } : {}) });
   }
   return out;
 }
@@ -369,6 +377,11 @@ export default function AdminHeroPage() {
                     <p className="mt-1 truncate font-mono text-xs text-zinc-400">
                       {s.url}
                     </p>
+                    {s.kind === "video" && s.mobileUrl ? (
+                      <p className="mt-0.5 truncate font-mono text-[11px] text-zinc-500">
+                        모바일: {s.mobileUrl}
+                      </p>
+                    ) : null}
                   </div>
                   <div className="flex shrink-0 flex-wrap gap-2">
                     <button
