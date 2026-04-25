@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "U:RION — 상상을, 현실로",
   description:
     "전략부터 실행까지 디지털 경험을 설계합니다. / Strategy through execution—we design digital experiences that move your business forward.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
