@@ -80,6 +80,8 @@ function touchTargetAllowsHorizontalScroll(
 const SLIDE_DURATION_MS = 700;
 const WHEEL_DELTA_THRESHOLD = 40;
 const SWIPE_PX_THRESHOLD = 56;
+/** 모바일(`max-lg`): 히어로는 헤더 배경 없음 — 내부 스크롤이 이 값(px)을 넘기면 반투명 헤더 표시 */
+const MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX = 24;
 
 export function Landing() {
   const { t } = useI18n();
@@ -87,14 +89,74 @@ export function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
+  /** `max-lg` 전용: 히어로 제외, 스크롤 깊이에 따라 헤더 반투명 배경 */
+  const [mobileHeaderFill, setMobileHeaderFill] = useState(false);
   const slideLockRef = useRef(false);
   const slideIndexRef = useRef(0);
+  const contactScrollRef = useRef<HTMLDivElement | null>(null);
   const touchStartY = useRef<number | null>(null);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     slideIndexRef.current = slideIndex;
   }, [slideIndex]);
+
+  const syncMobileHeaderFillFromScroll = useCallback(() => {
+    const i = slideIndexRef.current;
+    if (i === 0) {
+      setMobileHeaderFill(false);
+      return;
+    }
+    if (i === 1) {
+      const el = document.querySelector<HTMLElement>(
+        "[data-tpf-mobile-scroll]",
+      );
+      setMobileHeaderFill(
+        !!el && el.scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
+      );
+      return;
+    }
+    if (i === 2) {
+      const el = contactScrollRef.current;
+      setMobileHeaderFill(
+        !!el && el.scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (slideIndex === 0) {
+      setMobileHeaderFill(false);
+      return;
+    }
+    const id = requestAnimationFrame(() => syncMobileHeaderFillFromScroll());
+    return () => cancelAnimationFrame(id);
+  }, [slideIndex, syncMobileHeaderFillFromScroll]);
+
+  useEffect(() => {
+    if (slideIndex !== 2) return;
+    const el = contactScrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      if (slideIndexRef.current !== 2) return;
+      setMobileHeaderFill(
+        el.scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
+      );
+    };
+    onScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [slideIndex]);
+
+  const onTpfMobileScrollRegionScroll = useCallback(
+    (scrollTop: number) => {
+      if (slideIndexRef.current !== 1) return;
+      setMobileHeaderFill(
+        scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
+      );
+    },
+    [],
+  );
 
   const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
 
@@ -279,7 +341,13 @@ export function Landing() {
   return (
     <>
       {/* 상단 고정: 슬라이드 전환 시에도 동일 위치 */}
-      <header className="pointer-events-auto fixed inset-x-0 top-0 z-[90] flex items-center justify-between gap-4 bg-transparent px-6 py-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-10">
+      <header
+        className={`pointer-events-auto fixed inset-x-0 top-0 z-[90] flex items-center justify-between gap-4 px-6 py-4 pt-[max(1rem,env(safe-area-inset-top))] transition-[background-color,border-color,backdrop-filter] duration-300 sm:px-10 lg:border-b lg:border-white/[0.07] lg:bg-zinc-950/80 lg:backdrop-blur-md lg:backdrop-saturate-150 ${
+          mobileHeaderFill
+            ? "max-lg:border-b max-lg:border-white/[0.07] max-lg:bg-zinc-950/80 max-lg:backdrop-blur-md max-lg:backdrop-saturate-150"
+            : "max-lg:border-b max-lg:border-transparent max-lg:bg-transparent max-lg:backdrop-blur-none"
+        }`}
+      >
         <button
           type="button"
           onClick={goHome}
@@ -353,11 +421,11 @@ export function Landing() {
           <section
             id="hero"
             aria-label="Hero"
-            className="relative isolate flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden bg-black text-zinc-100"
+            className="relative isolate flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden bg-black text-zinc-100 max-lg:pt-[calc(env(safe-area-inset-top)+5.5rem+140px)] lg:pt-0"
           >
             <HeroBackdrop slides={heroSlides} />
 
-            <main className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6 pb-24 pt-2 sm:px-10 sm:pb-28">
+            <main className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6 pb-24 pt-2 max-lg:pt-0 sm:px-10 sm:pb-28">
               <div className="mx-auto max-w-4xl text-center">
                 {/* 히어로 카피·설명·메인 문의 CTA — 비표시
             <h1 className="bg-gradient-to-br from-white via-zinc-100 to-zinc-500 bg-clip-text text-5xl font-extrabold leading-[1.05] tracking-tight text-transparent sm:text-6xl md:text-7xl lg:text-8xl">
@@ -397,7 +465,9 @@ export function Landing() {
             className="relative flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden bg-black"
             aria-label={t.tpf.ariaLabel}
           >
-            <TpfProcessSection />
+            <TpfProcessSection
+              onMobileScrollRegionScroll={onTpfMobileScrollRegionScroll}
+            />
           </section>
 
           <section
@@ -405,7 +475,10 @@ export function Landing() {
             className="flex h-dvh shrink-0 flex-col overflow-hidden border-t border-white/10 bg-zinc-950"
             aria-label={t.contact.title}
           >
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain px-4 pb-3 pt-[max(5.5rem,env(safe-area-inset-top)+3.5rem)] sm:px-8 sm:pb-4 sm:pt-[max(6rem,env(safe-area-inset-top)+4rem)]">
+            <div
+              ref={contactScrollRef}
+              className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain px-4 pb-3 pt-[max(5.5rem,env(safe-area-inset-top)+3.5rem)] sm:px-8 sm:pb-4 sm:pt-[max(6rem,env(safe-area-inset-top)+4rem)]"
+            >
               <ContactSection />
               <footer className="mt-auto shrink-0 border-t border-white/10 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pt-5 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
                 <p className="text-center text-xs text-zinc-500 sm:text-sm">

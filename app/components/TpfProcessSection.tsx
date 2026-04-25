@@ -33,8 +33,9 @@ function titleStartsWithPre(text: string) {
 const tpfDiscListCore =
   "list-outside list-disc space-y-4 pl-5 text-left text-[18px] font-normal leading-[1.6] break-keep text-white marker:text-white sm:space-y-5 sm:pl-5 [&>li]:pl-0.5";
 
+/** `list-outside` + 상위 `overflow-hidden`(아코디언 애니메이션)이면 iOS에서 번호 마커가 잘림 → `list-inside` */
 const tpfNumberedSublistCoreClass =
-  "list-decimal space-y-1.5 pl-5 text-left text-[18px] font-normal leading-[1.6] break-keep text-zinc-400 marker:text-zinc-500 sm:space-y-2 sm:pl-5";
+  "list-inside list-decimal space-y-1.5 pl-4 text-left text-[18px] font-normal leading-[1.6] break-keep text-zinc-400 marker:text-zinc-500 sm:space-y-2 sm:pl-5";
 
 const tpfNumberedSublistClass =
   `mt-2.5 sm:mt-3 ${tpfNumberedSublistCoreClass}`;
@@ -258,7 +259,14 @@ function TpfMainHeading({
   );
 }
 
-export function TpfProcessSection() {
+type TpfProcessSectionProps = {
+  /** 모바일 세로 스크롤 래퍼 — 랜딩 헤더 배경(스크롤 시만) 연동용 */
+  onMobileScrollRegionScroll?: (scrollTop: number) => void;
+};
+
+export function TpfProcessSection({
+  onMobileScrollRegionScroll,
+}: TpfProcessSectionProps) {
   const { t } = useI18n();
   const p = t.tpf;
   const titleGradient = titleStartsWithPre(p.title);
@@ -286,6 +294,9 @@ export function TpfProcessSection() {
             className={`min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch] ${tpfMobileScrollHide}`}
             role="region"
             aria-label={p.title}
+            onScroll={(e) =>
+              onMobileScrollRegionScroll?.(e.currentTarget.scrollTop)
+            }
           >
             {/* 배경은 고정 slab만 `cover`+`center 30%`(PC와 동일). 전체 스크롤 높이에 맞추면 확대·잘림; 100dvh만 두면 GIF 아래가 검게 끊김 → slab을 약간 키움 */}
             <div className="relative isolate w-full">
@@ -299,7 +310,7 @@ export function TpfProcessSection() {
               />
               <div className="pointer-events-none absolute left-0 right-0 top-0 z-[1] h-[min(132dvh,920px)] bg-gradient-to-b from-black/30 via-black/65 to-black/[0.93]" aria-hidden />
               <div className="relative z-10 [&>section+section]:border-t [&>section+section]:border-white/10">
-                <div className="flex flex-col items-start px-5 pt-[90px] pb-6 sm:px-6 sm:pb-8">
+                <div className="flex flex-col items-start px-5 pb-6 pt-[calc(env(safe-area-inset-top)+5.5rem+60px)] sm:px-6 sm:pb-8">
                   <TpfMainHeading p={p} titleGradient={titleGradient} />
                 </div>
                 <TpfMobileScrollBlock>
