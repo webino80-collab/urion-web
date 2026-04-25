@@ -37,11 +37,7 @@ export type Messages = {
     successSub: string;
     close: string;
     directions: string;
-    contactInfo: string;
     mapLink: string;
-    phoneLabel: string;
-    emailLabel: string;
-    hoursLabel: string;
     name: string;
     email: string;
     message: string;
@@ -61,10 +57,6 @@ export type Messages = {
   };
   contactSite: {
     address: string;
-    directions: string;
-    hours: string;
-    phone: string;
-    email: string;
     /** Google Maps 검색용 (한글 주소 권장) */
     mapQuery: string;
   };
@@ -122,11 +114,7 @@ const ko: Messages = {
     successSub: "확인 후 입력하신 이메일로 연락드리겠습니다.",
     close: "닫기",
     directions: "오시는 길",
-    contactInfo: "연락처 정보",
     mapLink: "지도에서 보기",
-    phoneLabel: "전화",
-    emailLabel: "이메일",
-    hoursLabel: "운영 시간",
     name: "이름",
     email: "이메일",
     message: "메시지",
@@ -148,11 +136,6 @@ const ko: Messages = {
   contactSite: {
     address:
       "경기도 화성시 동탄영천로 150 현대실리콘앨리동탄 B동 1135호",
-    directions:
-      "SRT·수도권 전철 동탄역 인근입니다. 방문 전 주차·동선은 전화로 문의해 주시면 안내드립니다.",
-    hours: "평일 10:00 – 18:00 · 주말·공휴일 휴무",
-    phone: "031-5180-0725",
-    email: "daecheol.bang@uri-on.com",
     mapQuery:
       "경기도 화성시 동탄영천로 150 현대실리콘앨리동탄 B동 1135호",
   },
@@ -250,11 +233,7 @@ const en: Messages = {
     successSub: "We’ll reach out to the email you provided.",
     close: "Close",
     directions: "Directions",
-    contactInfo: "Contact details",
     mapLink: "View on map",
-    phoneLabel: "Phone",
-    emailLabel: "Email",
-    hoursLabel: "Hours",
     name: "Name",
     email: "Email",
     message: "Message",
@@ -276,11 +255,6 @@ const en: Messages = {
   contactSite: {
     address:
       "1135, Building B, Hyundai Silicon Alley Dongtan, 150 Dongtan Yeongcheon-ro, Hwaseong-si, Gyeonggi-do, Republic of Korea",
-    directions:
-      "Near SRT / Seoul Metropolitan Subway Dongtan Station. Please call ahead for parking and building access.",
-    hours: "Weekdays 10:00–18:00 · Closed weekends and public holidays",
-    phone: "031-5180-0725",
-    email: "daecheol.bang@uri-on.com",
     mapQuery:
       "경기도 화성시 동탄영천로 150 현대실리콘앨리동탄 B동 1135호",
   },

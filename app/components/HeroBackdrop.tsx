@@ -1,9 +1,42 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type { HeroSlide } from "@/lib/hero-types";
 
 const IMAGE_DURATION_MS = 8000;
+/** Tailwind `lg` 미만 = 모바일·태블릿 히어로 영상 (`mobileUrl`) */
+const MOBILE_HERO_MQ = "(max-width: 1023px)";
+
+function useHeroVideoSrc(slide: HeroSlide | null): string {
+  const [src, setSrc] = useState(slide?.url ?? "");
+
+  useLayoutEffect(() => {
+    if (!slide) {
+      setSrc("");
+      return;
+    }
+    if (slide.kind !== "video") {
+      setSrc(slide.url);
+      return;
+    }
+    const mq = window.matchMedia(MOBILE_HERO_MQ);
+    const sync = () => {
+      setSrc(mq.matches && slide.mobileUrl ? slide.mobileUrl : slide.url);
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, [slide?.id, slide?.kind, slide?.url, slide?.mobileUrl]);
+
+  if (!slide) return "";
+  return slide.kind === "video" ? src : slide.url;
+}
 
 type HeroBackdropProps = {
   slides: HeroSlide[];
@@ -35,9 +68,10 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
     };
   }, [activeIndex, slides, count, goNext]);
 
-  if (count === 0) return null;
+  const slide = count === 0 ? null : slides[activeIndex]!;
+  const videoSrc = useHeroVideoSrc(slide);
 
-  const slide = slides[activeIndex]!;
+  if (count === 0 || !slide) return null;
 
   return (
     <div
@@ -47,10 +81,11 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/65" />
       {slide.kind === "video" ? (
         // 배경 영상은 항상 무음 (autoplay 정책 대응)
+        // `<source media>`는 비디오에서 브라우저별로 불안정 → 뷰포트에 맞는 단일 src 사용
         <video
-          key={slide.id}
+          key={`${slide.id}-${videoSrc}`}
           className="absolute inset-0 h-full w-full scale-105 object-cover opacity-90"
-          {...(slide.mobileUrl ? {} : { src: slide.url })}
+          src={videoSrc}
           muted
           playsInline
           autoPlay
@@ -70,18 +105,7 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
           onEnded={() => {
             if (count > 1) goNext();
           }}
-        >
-          {slide.mobileUrl ? (
-            <>
-              <source
-                src={slide.mobileUrl}
-                media="(max-width: 767px)"
-                type="video/mp4"
-              />
-              <source src={slide.url} type="video/mp4" />
-            </>
-          ) : null}
-        </video>
+        />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- 동적 URL·GIF·webp 등 비최적화 원본
         <img

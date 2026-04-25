@@ -170,9 +170,6 @@ export function ContactSection({
                 <p className="mt-3 text-base leading-relaxed text-zinc-300">
                   {site.address}
                 </p>
-                <p className="mt-2 text-base leading-relaxed text-zinc-500">
-                  {site.directions}
-                </p>
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`}
                   target="_blank"
@@ -181,46 +178,6 @@ export function ContactSection({
                 >
                   {t.contact.mapLink}
                 </a>
-              </section>
-              <section aria-labelledby={`${idp}-info-heading`}>
-                <h3
-                  id={`${idp}-info-heading`}
-                  className="text-sm font-semibold uppercase tracking-wider text-violet-400"
-                >
-                  {t.contact.contactInfo}
-                </h3>
-                <ul className="mt-3 space-y-3 text-base text-zinc-300">
-                  <li>
-                    <span className="block text-sm text-zinc-500">
-                      {t.contact.phoneLabel}
-                    </span>
-                    <a
-                      href={`tel:${site.phone.replace(/\D/g, "")}`}
-                      className="mt-0.5 inline-block text-white hover:text-violet-300"
-                    >
-                      {site.phone}
-                    </a>
-                  </li>
-                    <li>
-                      <span className="block text-sm text-zinc-500">
-                        {t.contact.emailLabel}
-                      </span>
-                    <a
-                      href={`mailto:${site.email}`}
-                      className="mt-0.5 inline-block break-all text-white hover:text-violet-300"
-                    >
-                      {site.email}
-                    </a>
-                  </li>
-                    <li>
-                      <span className="block text-sm text-zinc-500">
-                        {t.contact.hoursLabel}
-                      </span>
-                    <span className="mt-0.5 block text-zinc-400">
-                      {site.hours}
-                    </span>
-                  </li>
-                </ul>
               </section>
             </div>
           </aside>
