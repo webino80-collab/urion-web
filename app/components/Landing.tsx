@@ -351,7 +351,7 @@ export function Landing() {
         <button
           type="button"
           onClick={goHome}
-          className="inline-flex min-h-12 cursor-pointer items-center px-2 text-left text-sm font-bold tracking-[0.2em] text-zinc-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="inline-flex min-h-12 cursor-pointer items-center px-2 text-left text-sm font-bold tracking-[0.2em] text-zinc-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent max-lg:px-0"
           aria-label={t.landing.logoHomeAria}
         >
           U:RION
@@ -381,7 +381,7 @@ export function Landing() {
 
           <button
             type="button"
-            className="flex h-12 w-12 shrink-0 items-center justify-center text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:text-white focus-visible:ring-2 focus-visible:ring-violet-500/60 sm:hidden"
+            className="flex h-12 w-12 shrink-0 items-center justify-center text-zinc-200 transition-colors hover:text-white focus:outline-none focus-visible:text-white focus-visible:ring-2 focus-visible:ring-violet-500/60 max-lg:justify-end max-lg:px-0 sm:hidden"
             aria-expanded={mobileMenuOpen}
             aria-controls="landing-mobile-nav"
             aria-label={t.landing.openMenuAria}
