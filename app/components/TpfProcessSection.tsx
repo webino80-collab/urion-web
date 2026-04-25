@@ -72,7 +72,7 @@ const tpfMobileScrollHide =
 /** 모바일 세로 스크롤 본문 안의 한 블록 (구 가로 슬라이드 1칸 분량). 상단 구분선은 부모의 `[&>section+section]`으로만 줌(첫 블록은 제목 div 뒤라 `first:` 불가). */
 function TpfMobileScrollBlock({ children }: { children: ReactNode }) {
   return (
-    <section className="px-5 py-10 sm:px-6 sm:py-12">{children}</section>
+    <section className="px-6 py-10 sm:px-10 sm:py-12">{children}</section>
   );
 }
 
@@ -310,7 +310,7 @@ export function TpfProcessSection({
               />
               <div className="pointer-events-none absolute left-0 right-0 top-0 z-[1] h-[min(132dvh,920px)] bg-gradient-to-b from-black/30 via-black/65 to-black/[0.93]" aria-hidden />
               <div className="relative z-10 [&>section+section]:border-t [&>section+section]:border-white/10">
-                <div className="flex flex-col items-start px-5 pb-6 pt-[calc(env(safe-area-inset-top)+5.5rem+60px)] sm:px-6 sm:pb-8">
+                <div className="flex flex-col items-start px-6 pb-6 pt-[calc(env(safe-area-inset-top)+5.5rem+60px)] sm:px-10 sm:pb-8">
                   <TpfMainHeading p={p} titleGradient={titleGradient} />
                 </div>
                 <TpfMobileScrollBlock>

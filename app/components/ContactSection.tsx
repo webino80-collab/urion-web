@@ -97,7 +97,7 @@ export function ContactSection({
         className={
           embedded
             ? "border-b border-white/5 p-6 pb-5 sm:p-8 sm:pb-6"
-            : "shrink-0 border-b border-white/10 px-1 pb-4 pt-1 sm:px-2"
+            : "shrink-0 border-b border-white/10 px-0 pb-4 pt-1 sm:px-0"
         }
       >
         <div className="flex items-start justify-between gap-4">
@@ -140,7 +140,13 @@ export function ContactSection({
       </div>
 
       {status === "success" ? (
-        <div className="px-1 py-8 text-center sm:px-2">
+        <div
+          className={
+            embedded
+              ? "px-1 py-8 text-center sm:px-2"
+              : "px-0 py-8 text-center sm:px-0"
+          }
+        >
           <p className="text-lg font-medium text-white">
             {t.contact.successTitle}
           </p>
@@ -158,7 +164,11 @@ export function ContactSection({
         </div>
       ) : (
         <div className="grid gap-0 lg:grid-cols-2 lg:gap-0">
-          <aside className="order-2 border-t border-white/5 px-1 py-6 sm:px-2 sm:py-8 lg:order-1 lg:border-t-0">
+          <aside
+            className={`order-2 border-t border-white/5 py-6 sm:py-8 lg:order-1 lg:border-t-0 ${
+              embedded ? "px-1 sm:px-2" : "px-0 sm:px-0"
+            }`}
+          >
             <div className="space-y-[42px]">
               <section aria-labelledby={`${idp}-directions-heading`}>
                 <h3
@@ -182,7 +192,11 @@ export function ContactSection({
             </div>
           </aside>
 
-          <div className="order-1 px-1 py-6 sm:px-2 sm:py-8 lg:order-2">
+          <div
+            className={`order-1 py-6 sm:py-8 lg:order-2 ${
+              embedded ? "px-1 sm:px-2" : "px-0 sm:px-0"
+            }`}
+          >
             <form
               className="flex flex-col gap-4"
               onSubmit={handleSubmit}

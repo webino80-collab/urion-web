@@ -477,7 +477,7 @@ export function Landing() {
           >
             <div
               ref={contactScrollRef}
-              className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain px-4 pb-3 pt-[max(5.5rem,env(safe-area-inset-top)+3.5rem)] sm:px-8 sm:pb-4 sm:pt-[max(6rem,env(safe-area-inset-top)+4rem)]"
+              className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain px-6 pb-3 pt-[max(5.5rem,env(safe-area-inset-top)+3.5rem)] sm:px-10 sm:pb-4 sm:pt-[max(6rem,env(safe-area-inset-top)+4rem)]"
             >
               <ContactSection />
               <footer className="mt-auto shrink-0 border-t border-white/10 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pt-5 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
@@ -506,7 +506,7 @@ export function Landing() {
           />
           <nav
             id="landing-mobile-nav"
-            className="relative flex h-full w-[min(100%,20rem)] flex-col border-l border-white/10 bg-zinc-950/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] shadow-[-12px_0_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+            className="relative flex h-full w-[min(100%,20rem)] flex-col border-l border-white/10 bg-zinc-950/95 px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] shadow-[-12px_0_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
           >
             <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
               <p
