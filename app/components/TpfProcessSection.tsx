@@ -132,7 +132,7 @@ function TpfAdvantagesContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
               {mobile && hasSubs ? (
                 <button
                   type="button"
-                  className="flex min-h-12 w-full items-start justify-between gap-3 rounded-sm py-2 text-left text-[18px] font-normal leading-[1.6] text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
+                  className="flex min-h-12 w-full items-center justify-between gap-3 rounded-sm py-2 text-left text-[18px] font-normal leading-[1.6] text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
                   aria-expanded={expanded}
                   aria-controls={subId}
                   onClick={() =>
@@ -143,7 +143,7 @@ function TpfAdvantagesContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
                     {item.heading}
                   </span>
                   <span
-                    className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-sm text-lg font-semibold leading-none text-zinc-200 tabular-nums"
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-lg font-semibold leading-none text-zinc-200 tabular-nums"
                     aria-hidden
                   >
                     {expanded ? "−" : "+"}
