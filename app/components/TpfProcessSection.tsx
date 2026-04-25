@@ -72,7 +72,7 @@ const tpfMobileScrollHide =
 function TpfMobileSlidePage({ children }: { children: ReactNode }) {
   return (
     <section
-      className={`box-border flex h-full min-h-0 w-full min-w-full shrink-0 snap-start flex-col overflow-y-auto overflow-x-hidden bg-black px-5 py-6 sm:px-6 ${tpfMobileScrollHide}`}
+      className={`box-border flex h-full min-h-0 w-full min-w-full shrink-0 snap-start flex-col overflow-y-auto overflow-x-hidden bg-transparent px-5 py-6 sm:px-6 ${tpfMobileScrollHide}`}
     >
       {children}
     </section>
@@ -260,7 +260,7 @@ export function TpfProcessSection() {
         aria-hidden
       />
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        <div className="flex shrink-0 flex-col items-start justify-start px-5 pt-[120px] pb-8 sm:px-6 sm:pb-10 lg:items-center lg:px-8 lg:pb-12 xl:px-12">
+        <div className="flex shrink-0 flex-col items-start justify-start px-5 pt-[90px] pb-8 sm:px-6 sm:pb-10 lg:items-center lg:px-8 lg:pb-12 lg:pt-[120px] xl:px-12">
           <h2
             className={`w-full max-w-[min(90%,52rem)] text-left font-sans text-[32px] font-extralight leading-[1.15] tracking-[0.06em] lg:text-center lg:text-[48px] ${
               titleGradient
@@ -276,7 +276,7 @@ export function TpfProcessSection() {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:hidden">
           <div
             data-tpf-mobile-slides
-            className={`flex min-h-0 flex-1 flex-row overflow-x-auto overflow-y-hidden overscroll-x-contain bg-black snap-x snap-mandatory [-webkit-overflow-scrolling:touch] pb-[max(0.5rem,env(safe-area-inset-bottom))] ${tpfMobileScrollHide}`}
+            className={`flex min-h-0 flex-1 flex-row overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory [-webkit-overflow-scrolling:touch] pb-[max(0.5rem,env(safe-area-inset-bottom))] ${tpfMobileScrollHide}`}
             role="region"
             aria-label={`${p.title} 본문 (좌우 스와이프)`}
           >
