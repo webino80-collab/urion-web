@@ -206,7 +206,11 @@ function TpfResinContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
       <ul className={`mt-5 sm:mt-6 ${tpfDiscListCore}`} aria-labelledby={hid}>
         <li>{p.resinBullets[0]}</li>
       </ul>
-      <div className="relative mt-0 h-[min(16dvh,9rem)] w-full max-w-lg shrink-0 overflow-hidden sm:h-[min(18dvh,10rem)] lg:h-[min(20dvh,10.5rem)] xl:h-[min(22dvh,11.5rem)] max-lg:mx-auto max-lg:max-w-none">
+      <div
+        className={`relative h-[min(16dvh,9rem)] w-full max-w-lg shrink-0 overflow-hidden sm:h-[min(18dvh,10rem)] lg:h-[min(20dvh,10.5rem)] xl:h-[min(22dvh,11.5rem)] max-lg:mx-auto max-lg:max-w-none ${
+          mobile ? "my-[20px]" : "mt-0"
+        }`}
+      >
         <Image
           src="/tech01.webp"
           alt={p.tech01Alt}
