@@ -9,7 +9,7 @@ import { PinGifPlayer } from "./PinGifPlayer";
 /**
  * TPF 섹션 — 반응형 규약
  * - **PC(고정 기준)**: `lg`(≥1024px) 이상에서 확정된 레이아웃·타이포. 여기 손댈 땐 PC 너비에서 회귀 확인.
- * - **모바일**: `< lg` — 상단 h2·배경 유지, 본문은 **가로 스냅 4슬라이드**(개요 → 장점 → 수지 → 다중비아), 슬라이드 안에서만 세로 스크롤.
+ * - **모바일**: `< lg` — 상단 h2·배경 유지, 본문은 **세로 스크롤 한 열**(개요 → 장점 → 수지 → 다중비아 순).
  * - 공통 상수(`tpfDiscListCore` 등)를 바꿀 때는 모바일·PC 둘 다 확인.
  *
  * 그리드 최대 너비(디자인 기준 1920) — PC 3열: 장점 | 개요·pin | 수지·tech01·다중비아
@@ -68,14 +68,10 @@ function TpfTitleRow({ children }: { children: ReactNode }) {
 const tpfMobileScrollHide =
   "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:h-0 [&::-webkit-scrollbar]:w-0";
 
-/** 모바일 가로 캐러셀 한 슬라이드 — 뷰포트 너비 1칸, 내부 세로 스크롤(스크롤바는 숨김) */
-function TpfMobileSlidePage({ children }: { children: ReactNode }) {
+/** 모바일 세로 스크롤 본문 안의 한 블록 (구 가로 슬라이드 1칸 분량). 상단 구분선은 부모의 `[&>section+section]`으로만 줌(첫 블록은 제목 div 뒤라 `first:` 불가). */
+function TpfMobileScrollBlock({ children }: { children: ReactNode }) {
   return (
-    <section
-      className={`box-border flex h-full min-h-0 w-full min-w-full shrink-0 snap-start flex-col overflow-y-auto overflow-x-hidden bg-transparent px-5 py-6 sm:px-6 ${tpfMobileScrollHide}`}
-    >
-      {children}
-    </section>
+    <section className="px-5 py-10 sm:px-6 sm:py-12">{children}</section>
   );
 }
 
@@ -98,8 +94,8 @@ function TpfOverviewContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
           ))}
         </ul>
       </TpfTitleRow>
-      <div className="mt-[20px] flex min-h-0 flex-1 items-start justify-start max-lg:mt-6">
-        <div className="flex max-h-full w-full max-w-[min(100%,26rem)] items-start justify-start overflow-hidden p-3 sm:p-4 max-lg:max-w-none max-lg:justify-center">
+      <div className="mt-[20px] flex min-h-0 flex-1 items-start justify-start max-lg:mt-6 max-lg:flex-none max-lg:min-h-0">
+        <div className="flex max-h-full w-full max-w-[min(100%,26rem)] items-start justify-start overflow-hidden p-3 sm:p-4 max-lg:max-h-none max-lg:max-w-none max-lg:justify-center">
           <PinGifPlayer
             src="/pin.gif"
             alt={p.pinGifAlt}
@@ -122,7 +118,7 @@ function TpfAdvantagesContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
         {p.advantagesTitle}
       </h3>
       <ul
-        className={`mt-5 min-h-0 flex-1 sm:mt-6 ${tpfDiscListCore} ${mobile ? `overflow-y-auto ${tpfMobileScrollHide}` : "overflow-hidden"}`}
+        className={`mt-5 sm:mt-6 ${tpfDiscListCore} ${mobile ? "" : "min-h-0 flex-1 overflow-hidden"}`}
         aria-labelledby={hid}
       >
         {p.advantagesItems.map((item, i) => {
@@ -244,6 +240,24 @@ function TpfMultiViaContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
   );
 }
 
+function TpfMainHeading({
+  p,
+  titleGradient,
+}: {
+  p: TpfDict;
+  titleGradient: boolean;
+}) {
+  return (
+    <h2
+      className={`w-full max-w-[min(90%,52rem)] text-left font-sans text-[32px] font-extralight leading-[1.15] tracking-[0.06em] lg:text-center lg:text-[48px] ${
+        titleGradient ? preLeadingTitleGradientClass : "text-white"
+      }`}
+    >
+      {p.title}
+    </h2>
+  );
+}
+
 export function TpfProcessSection() {
   const { t } = useI18n();
   const p = t.tpf;
@@ -251,8 +265,9 @@ export function TpfProcessSection() {
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-black font-sans text-white">
+      {/* PC만: 섹션 높이(h-dvh)에 맞춰 고정 배경. 모바일은 아래 스크롤 래퍼 안에서 같이 움직임 */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 bg-cover bg-no-repeat"
+        className="pointer-events-none absolute inset-0 z-0 hidden bg-cover bg-no-repeat lg:block"
         style={{
           backgroundImage: `url("${HERO_BG}")`,
           backgroundPosition: HERO_BG_POSITION,
@@ -260,51 +275,60 @@ export function TpfProcessSection() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/30 via-black/65 to-black/[0.93]"
+        className="pointer-events-none absolute inset-0 z-[1] hidden bg-gradient-to-b from-black/30 via-black/65 to-black/[0.93] lg:block"
         aria-hidden
       />
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        <div className="flex shrink-0 flex-col items-start justify-start px-5 pt-[90px] pb-8 sm:px-6 sm:pb-10 lg:items-center lg:px-8 lg:pb-12 lg:pt-[120px] xl:px-12">
-          <h2
-            className={`w-full max-w-[min(90%,52rem)] text-left font-sans text-[32px] font-extralight leading-[1.15] tracking-[0.06em] lg:text-center lg:text-[48px] ${
-              titleGradient
-                ? preLeadingTitleGradientClass
-                : "text-white"
-            }`}
-          >
-            {p.title}
-          </h2>
-        </div>
-
-        {/* 모바일: h2·배경 아래 — 가로 스냅 4슬라이드 (개요 → 장점 → 수지 → 다중비아) */}
+        {/* 모바일: 제목 + 본문 한 덩어리로 세로 스크롤 */}
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:hidden">
           <div
-            data-tpf-mobile-slides
-            className={`flex min-h-0 flex-1 flex-row overflow-x-auto overflow-y-hidden overscroll-x-contain snap-x snap-mandatory [-webkit-overflow-scrolling:touch] pb-[max(0.5rem,env(safe-area-inset-bottom))] ${tpfMobileScrollHide}`}
+            data-tpf-mobile-scroll
+            className={`min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch] ${tpfMobileScrollHide}`}
             role="region"
-            aria-label={`${p.title} 본문 (좌우 스와이프)`}
+            aria-label={p.title}
           >
-            <TpfMobileSlidePage>
-              <TpfOverviewContent p={p} mobile />
-            </TpfMobileSlidePage>
-            <TpfMobileSlidePage>
-              <TpfAdvantagesContent p={p} mobile />
-            </TpfMobileSlidePage>
-            <TpfMobileSlidePage>
-              <TpfResinContent p={p} mobile />
-            </TpfMobileSlidePage>
-            <TpfMobileSlidePage>
-              <TpfMultiViaContent p={p} mobile />
-            </TpfMobileSlidePage>
+            {/* 배경은 고정 slab만 `cover`+`center 30%`(PC와 동일). 전체 스크롤 높이에 맞추면 확대·잘림; 100dvh만 두면 GIF 아래가 검게 끊김 → slab을 약간 키움 */}
+            <div className="relative isolate w-full">
+              <div
+                className="pointer-events-none absolute left-0 right-0 top-0 z-0 h-[min(132dvh,920px)] bg-cover bg-no-repeat"
+                style={{
+                  backgroundImage: `url("${HERO_BG}")`,
+                  backgroundPosition: HERO_BG_POSITION,
+                }}
+                aria-hidden
+              />
+              <div className="pointer-events-none absolute left-0 right-0 top-0 z-[1] h-[min(132dvh,920px)] bg-gradient-to-b from-black/30 via-black/65 to-black/[0.93]" aria-hidden />
+              <div className="relative z-10 [&>section+section]:border-t [&>section+section]:border-white/10">
+                <div className="flex flex-col items-start px-5 pt-[90px] pb-6 sm:px-6 sm:pb-8">
+                  <TpfMainHeading p={p} titleGradient={titleGradient} />
+                </div>
+                <TpfMobileScrollBlock>
+                  <TpfOverviewContent p={p} mobile />
+                </TpfMobileScrollBlock>
+                <TpfMobileScrollBlock>
+                  <TpfAdvantagesContent p={p} mobile />
+                </TpfMobileScrollBlock>
+                <TpfMobileScrollBlock>
+                  <TpfResinContent p={p} mobile />
+                </TpfMobileScrollBlock>
+                <TpfMobileScrollBlock>
+                  <TpfMultiViaContent p={p} mobile />
+                </TpfMobileScrollBlock>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* PC: 기존 3열 그리드 */}
-        <div className="hidden min-h-0 flex-1 flex-col overflow-hidden lg:flex lg:justify-center">
-          <div
-            className="mx-auto grid h-full min-h-0 w-full max-h-full grid-cols-3 gap-8 overflow-y-auto px-5 py-5 sm:gap-10 sm:px-6 sm:py-6 lg:gap-12 lg:px-4 lg:py-8 xl:gap-16 xl:py-10"
-            style={{ maxWidth: CONTENT_MAX }}
-          >
+        {/* PC: 상단 제목 고정 + 그리드만 스크롤 */}
+        <div className="hidden min-h-0 flex-1 flex-col overflow-hidden lg:flex">
+          <div className="flex shrink-0 flex-col items-start justify-start px-5 pb-8 sm:px-6 sm:pb-10 lg:items-center lg:px-8 lg:pb-12 lg:pt-[120px] xl:px-12">
+            <TpfMainHeading p={p} titleGradient={titleGradient} />
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:justify-center">
+            <div
+              className="mx-auto grid h-full min-h-0 w-full max-h-full grid-cols-3 gap-8 overflow-y-auto px-5 py-5 sm:gap-10 sm:px-6 sm:py-6 lg:gap-12 lg:px-4 lg:py-8 xl:gap-16 xl:py-10"
+              style={{ maxWidth: CONTENT_MAX }}
+            >
             <article className="flex min-h-0 flex-col overflow-hidden lg:pl-8 lg:pr-4 xl:pl-12 xl:pr-6">
               <TextColumn>
                 <TpfAdvantagesContent p={p} mobile={false} />
@@ -325,6 +349,7 @@ export function TpfProcessSection() {
                 </div>
               </TextColumn>
             </article>
+            </div>
           </div>
         </div>
       </div>
