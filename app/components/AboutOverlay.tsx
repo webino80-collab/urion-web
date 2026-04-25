@@ -76,7 +76,7 @@ export function AboutOverlay() {
           <div className="flex flex-col items-center lg:items-stretch">
             <div className="relative aspect-square w-full max-w-[12rem] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 lg:max-w-none">
               <Image
-                src="/images/ceo_4x.webp"
+                src="/images/ceo3.webp"
                 alt={t.about.ceoAlt}
                 fill
                 sizes="(max-width: 1024px) 192px, 192px"
