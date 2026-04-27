@@ -40,6 +40,12 @@ export default function RootLayout({
       lang={initialLocale}
       className="min-h-dvh overflow-x-hidden font-sans antialiased"
     >
+      <head>
+        {/*
+         YouTube 임베드 153(플레이어 구성) 완화: parent가 Referer를 끊지 않도록 문서 수준에서 고정
+        */}
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
+      </head>
       <body className="min-h-dvh overflow-x-hidden bg-black text-zinc-100 antialiased">
         <I18nProvider initialLocale={initialLocale}>
           {children}

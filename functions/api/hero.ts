@@ -5,12 +5,14 @@
  * Cloudflare Pages: KV 바인딩 이름 HERO_KV, (선택) ASSETS로 정적 JSON 폴백.
  */
 
+import { parseYouTubeVideoId } from "../../lib/hero-youtube";
+
 interface KVNamespace {
   get(key: string, type?: "text"): Promise<string | null>;
   put(key: string, value: string): Promise<void>;
 }
 
-type SlideKind = "image" | "video";
+type SlideKind = "image" | "video" | "youtube";
 
 type Slide = {
   id: string;
@@ -70,16 +72,27 @@ function normalizeSlideInput(item: unknown): Slide | null {
   if (!url || !isValidSlideUrl(url)) return null;
   const id =
     typeof o.id === "string" && o.id.trim() ? o.id.trim() : crypto.randomUUID();
-  const kind =
-    o.kind === "video" || o.kind === "image" ? o.kind : inferKind(url);
-  const ext = extFromUrl(url);
-  if (!ALLOWED_EXT.has(ext)) return null;
+  const ytid = parseYouTubeVideoId(url);
+  let kind: SlideKind =
+    o.kind === "image" || o.kind === "video" || o.kind === "youtube"
+      ? o.kind
+      : inferKind(url);
+  if (ytid) kind = "youtube";
+  if (kind === "youtube" && !ytid) return null;
+  if (kind !== "youtube") {
+    const ext = extFromUrl(url);
+    if (!ALLOWED_EXT.has(ext)) return null;
+  }
   let mobileUrl: string | undefined;
   const rawMobile =
     typeof o.mobileUrl === "string" ? o.mobileUrl.trim() : "";
-  if (kind === "video" && rawMobile) {
-    const extM = extFromUrl(rawMobile);
-    if (isValidSlideUrl(rawMobile) && ALLOWED_EXT.has(extM)) {
+  if (rawMobile) {
+    if (kind === "video") {
+      const extM = extFromUrl(rawMobile);
+      if (isValidSlideUrl(rawMobile) && ALLOWED_EXT.has(extM)) {
+        mobileUrl = rawMobile;
+      }
+    } else if (kind === "youtube" && parseYouTubeVideoId(rawMobile)) {
       mobileUrl = rawMobile;
     }
   }

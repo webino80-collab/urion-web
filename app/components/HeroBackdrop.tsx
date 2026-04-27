@@ -8,6 +8,63 @@ import {
   useState,
 } from "react";
 import type { HeroSlide } from "@/lib/hero-types";
+import {
+  buildYouTubeHeroEmbedSrc,
+  embedPageOriginForLocation,
+  parseYouTubeVideoId,
+} from "@/lib/hero-youtube";
+
+/** 153: iframe src는 클라이언트에서만 `origin` 쿼리를 붙여 구성(SSR/하이드레이션과 동일·Referer 정합) */
+function YouTubeHeroIframe({
+  videoId,
+  frameKey,
+}: {
+  videoId: string;
+  frameKey: string;
+}) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useLayoutEffect(() => {
+    setSrc(
+      buildYouTubeHeroEmbedSrc(videoId, {
+        useNoCookie: false,
+        origin: embedPageOriginForLocation(window.location),
+      }),
+    );
+  }, [videoId]);
+
+  if (src === null) {
+    return (
+      <div className="absolute inset-0 bg-zinc-950" aria-hidden />
+    );
+  }
+
+  return (
+    <iframe
+      key={frameKey}
+      className="pointer-events-none"
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        width: "100vw",
+        height: "56.25vw",
+        minWidth: "177.78vh",
+        minHeight: "100vh",
+        border: 0,
+        transform: "translate(-50%, -50%)",
+        opacity: 0.9,
+      }}
+      src={src}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+      allowFullScreen
+      title="YouTube video player"
+      tabIndex={-1}
+      loading="eager"
+      referrerPolicy="strict-origin-when-cross-origin"
+    />
+  );
+}
 
 const IMAGE_DURATION_MS = 8000;
 /** Tailwind `lg` 미만 = 모바일·태블릿 히어로 영상 (`mobileUrl`) */
@@ -46,6 +103,40 @@ function useHeroVideoSrc(slide: HeroSlide | null): string {
   return picked ?? slide.url;
 }
 
+/** 1023px 이하: mobileUrl(Shorts 등), 이상: 데스크톱 YouTube */
+function useHeroYouTubeVideoId(slide: HeroSlide | null): string | null {
+  const [id, setId] = useState<string | null>(null);
+
+  useLayoutEffect(() => {
+    if (!slide || slide.kind !== "youtube") {
+      setId(null);
+      return;
+    }
+    const desktop = parseYouTubeVideoId(slide.url);
+    if (!desktop) {
+      setId(null);
+      return;
+    }
+    const mq = window.matchMedia(MOBILE_HERO_MQ);
+    const sync = () => {
+      if (mq.matches && slide.mobileUrl) {
+        setId(
+          parseYouTubeVideoId(slide.mobileUrl) ?? desktop,
+        );
+      } else {
+        setId(desktop);
+      }
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, [slide?.id, slide?.url, slide?.mobileUrl, slide?.kind]);
+
+  if (!slide || slide.kind !== "youtube") return null;
+  if (id) return id;
+  return parseYouTubeVideoId(slide.url);
+}
+
 type HeroBackdropProps = {
   slides: HeroSlide[];
 };
@@ -72,7 +163,8 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
   useEffect(() => {
     if (count <= 1) return;
     const cur = slides[activeIndex];
-    if (!cur || cur.kind === "video") return;
+    if (!cur || cur.kind === "video" || cur.kind === "youtube")
+      return;
 
     timerRef.current = setTimeout(goNext, IMAGE_DURATION_MS);
     return () => {
@@ -81,6 +173,9 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
   }, [activeIndex, slides, count, goNext]);
 
   const slide = count === 0 ? null : slides[activeIndex]!;
+  const youTubeId = useHeroYouTubeVideoId(
+    slide?.kind === "youtube" ? slide : null,
+  );
   const baseVideoSrc = useHeroVideoSrc(slide);
   const videoSrc =
     slide?.kind === "video" &&
@@ -122,7 +217,17 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
       aria-hidden
     >
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/65" />
-      {slide.kind === "video" ? (
+      {slide.kind === "youtube" ? (
+        youTubeId ? (
+          <div className="absolute inset-0 scale-105 [transform:translate3d(0,0,0)]">
+            {/* 16:9 임베드는 뷰포트를 덮도록 확대(기존 video object-cover·scale-105에 맞춤) */}
+            <YouTubeHeroIframe
+              videoId={youTubeId}
+              frameKey={`${slide.id}-${youTubeId}`}
+            />
+          </div>
+        ) : null
+      ) : slide.kind === "video" ? (
         // 배경 영상은 항상 무음 (autoplay 정책 대응)
         // `<source media>`는 비디오에서 브라우저별로 불안정 → 뷰포트에 맞는 단일 src 사용
         <video

@@ -1,10 +1,15 @@
-export type HeroSlideKind = "image" | "video";
+import { parseYouTubeVideoId } from "./hero-youtube";
+
+export type HeroSlideKind = "image" | "video" | "youtube";
 
 export type HeroSlide = {
   id: string;
   url: string;
   kind: HeroSlideKind;
-  /** kind가 video일 때, 좁은 뷰포트에서 재생할 별도 영상 (예: 세로·저해상도) */
+  /**
+   * kind가 video: 좁은 뷰포트용 별도 mp4
+   * kind가 youtube: 좁은 뷰포트용 별도 YouTube URL(또는 11자 ID)
+   */
   mobileUrl?: string;
 };
 
@@ -38,6 +43,7 @@ export function extFromUrlOrPath(url: string): string {
 }
 
 export function inferHeroKind(url: string): HeroSlideKind {
+  if (parseYouTubeVideoId(url)) return "youtube";
   return VIDEO_EXT.has(extFromUrlOrPath(url)) ? "video" : "image";
 }
 
@@ -46,10 +52,17 @@ export function normalizeHeroMobileUrl(
   raw: unknown,
   slideKind: HeroSlideKind,
 ): string | undefined {
-  if (slideKind !== "video") return undefined;
   const mobile = typeof raw === "string" ? raw.trim() : "";
-  if (!mobile || inferHeroKind(mobile) !== "video") return undefined;
-  return mobile;
+  if (!mobile) return undefined;
+  if (slideKind === "video") {
+    if (inferHeroKind(mobile) !== "video") return undefined;
+    return mobile;
+  }
+  if (slideKind === "youtube") {
+    if (!parseYouTubeVideoId(mobile)) return undefined;
+    return mobile;
+  }
+  return undefined;
 }
 
 export function isAllowedHeroExtension(ext: string): ext is HeroAllowedExt {
