@@ -46,6 +46,8 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
   const count = slides.length;
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** 모바일 Safari 등: `autoPlay` 속성만으로는 무음 영상도 재생이 거절되는 경우가 있어 `play()`를 명시 호출 */
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const activeIndex = count === 0 ? 0 : Math.min(index, count - 1);
 
@@ -71,6 +73,27 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
   const slide = count === 0 ? null : slides[activeIndex]!;
   const videoSrc = useHeroVideoSrc(slide);
 
+  useEffect(() => {
+    if (!slide || slide.kind !== "video") return;
+    const v = heroVideoRef.current;
+    if (!v) return;
+
+    const ensurePlay = () => {
+      v.muted = true;
+      v.defaultMuted = true;
+      v.volume = 0;
+      void v.play().catch(() => undefined);
+    };
+
+    ensurePlay();
+    v.addEventListener("loadeddata", ensurePlay);
+    v.addEventListener("canplay", ensurePlay);
+    return () => {
+      v.removeEventListener("loadeddata", ensurePlay);
+      v.removeEventListener("canplay", ensurePlay);
+    };
+  }, [slide, videoSrc]);
+
   if (count === 0 || !slide) return null;
 
   return (
@@ -83,11 +106,14 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
         // 배경 영상은 항상 무음 (autoplay 정책 대응)
         // `<source media>`는 비디오에서 브라우저별로 불안정 → 뷰포트에 맞는 단일 src 사용
         <video
+          ref={heroVideoRef}
           key={`${slide.id}-${videoSrc}`}
           className="absolute inset-0 h-full w-full scale-105 object-cover opacity-90"
           src={videoSrc}
           muted
+          defaultMuted
           playsInline
+          preload="auto"
           autoPlay
           loop={count === 1}
           onLoadedMetadata={(e) => {
