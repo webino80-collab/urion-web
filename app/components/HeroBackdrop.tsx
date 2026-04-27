@@ -111,7 +111,6 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
           className="absolute inset-0 h-full w-full scale-105 object-cover opacity-90"
           src={videoSrc}
           muted
-          defaultMuted
           playsInline
           preload="auto"
           autoPlay
