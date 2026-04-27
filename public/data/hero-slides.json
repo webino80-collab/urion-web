@@ -3,9 +3,9 @@
   "slides": [
     {
       "id": "hero",
-      "url": "https://youtu.be/eECdE_RZesM",
-      "mobileUrl": "https://youtube.com/shorts/fPTidnrKVfI?feature=share",
-      "kind": "youtube"
+      "url": "/hero_1.mp4",
+      "mobileUrl": "/mobile_hero_1.mp4",
+      "kind": "video"
     }
   ]
 }

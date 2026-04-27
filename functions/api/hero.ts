@@ -12,13 +12,19 @@ interface KVNamespace {
   put(key: string, value: string): Promise<void>;
 }
 
-type SlideKind = "image" | "video" | "youtube";
+type SlideKind = "image" | "video";
 
 type Slide = {
   id: string;
   url: string;
   kind: SlideKind;
   mobileUrl?: string;
+};
+
+const LOCAL_HERO_VIDEO = {
+  kind: "video" as const,
+  url: "/hero_1.mp4",
+  mobileUrl: "/mobile_hero_1.mp4" as const,
 };
 
 interface HeroEnv {
@@ -72,27 +78,19 @@ function normalizeSlideInput(item: unknown): Slide | null {
   if (!url || !isValidSlideUrl(url)) return null;
   const id =
     typeof o.id === "string" && o.id.trim() ? o.id.trim() : crypto.randomUUID();
-  const ytid = parseYouTubeVideoId(url);
-  let kind: SlideKind =
-    o.kind === "image" || o.kind === "video" || o.kind === "youtube"
-      ? o.kind
-      : inferKind(url);
-  if (ytid) kind = "youtube";
-  if (kind === "youtube" && !ytid) return null;
-  if (kind !== "youtube") {
-    const ext = extFromUrl(url);
-    if (!ALLOWED_EXT.has(ext)) return null;
+  if (o.kind === "youtube" || parseYouTubeVideoId(url)) {
+    return { id, ...LOCAL_HERO_VIDEO };
   }
+  const kind: SlideKind =
+    o.kind === "image" || o.kind === "video" ? o.kind : inferKind(url);
+  const ext = extFromUrl(url);
+  if (!ALLOWED_EXT.has(ext)) return null;
   let mobileUrl: string | undefined;
   const rawMobile =
     typeof o.mobileUrl === "string" ? o.mobileUrl.trim() : "";
-  if (rawMobile) {
-    if (kind === "video") {
-      const extM = extFromUrl(rawMobile);
-      if (isValidSlideUrl(rawMobile) && ALLOWED_EXT.has(extM)) {
-        mobileUrl = rawMobile;
-      }
-    } else if (kind === "youtube" && parseYouTubeVideoId(rawMobile)) {
+  if (rawMobile && kind === "video") {
+    const extM = extFromUrl(rawMobile);
+    if (isValidSlideUrl(rawMobile) && ALLOWED_EXT.has(extM)) {
       mobileUrl = rawMobile;
     }
   }

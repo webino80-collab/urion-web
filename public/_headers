@@ -1,0 +1,3 @@
+# cross-origin에 Referer가 막히지 않도록(기본값·외부 API·미디어 등)
+/*
+  Referrer-Policy: strict-origin-when-cross-origin

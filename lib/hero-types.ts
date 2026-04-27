@@ -18,6 +18,16 @@ export type HeroConfig = {
   slides: HeroSlide[];
 };
 
+/**
+ * 구 YouTube/외부 히어로 JSON을 로컬 `public` mp4로 통일할 때 사용(동일 id 유지)
+ * Edge: H.264(AVC)+AAC를 권장(HEVC 등은 환경에 따라 미지원)
+ */
+export const HERO_LOCAL_DEFAULT_VIDEO: Omit<HeroSlide, "id"> = {
+  kind: "video",
+  url: "/hero_1.mp4",
+  mobileUrl: "/mobile_hero_1.mp4",
+};
+
 const VIDEO_EXT = new Set(["mp4"]);
 
 export const HERO_ALLOWED_EXTENSIONS = [
@@ -43,7 +53,6 @@ export function extFromUrlOrPath(url: string): string {
 }
 
 export function inferHeroKind(url: string): HeroSlideKind {
-  if (parseYouTubeVideoId(url)) return "youtube";
   return VIDEO_EXT.has(extFromUrlOrPath(url)) ? "video" : "image";
 }
 

@@ -1,15 +1,13 @@
 import { parseYouTubeVideoId } from "./hero-youtube";
 import type { HeroConfig, HeroSlide, HeroSlideKind } from "./hero-types";
-import { inferHeroKind, normalizeHeroMobileUrl } from "./hero-types";
+import {
+  HERO_LOCAL_DEFAULT_VIDEO,
+  inferHeroKind,
+  normalizeHeroMobileUrl,
+} from "./hero-types";
 
-/** API·정적 JSON 모두 실패 시에도 히어로가 비지 않도록 (YouTube 히어로를 기본과 동기) */
 const FALLBACK_HERO_SLIDES: HeroSlide[] = [
-  {
-    id: "hero",
-    url: "https://youtu.be/eECdE_RZesM",
-    kind: "youtube",
-    mobileUrl: "https://youtube.com/shorts/fPTidnrKVfI?feature=share",
-  },
+  { id: "hero", ...HERO_LOCAL_DEFAULT_VIDEO },
 ];
 
 function normalizeSlides(raw: unknown): HeroSlide[] {
@@ -24,12 +22,14 @@ function normalizeSlides(raw: unknown): HeroSlide[] {
       typeof o.id === "string" && o.id.trim()
         ? o.id.trim()
         : crypto.randomUUID();
-    let kind: HeroSlideKind =
-      o.kind === "video" || o.kind === "image" || o.kind === "youtube"
-        ? o.kind
-        : inferHeroKind(url);
-    if (parseYouTubeVideoId(url)) kind = "youtube";
-    if (kind === "youtube" && !parseYouTubeVideoId(url)) continue;
+    /** 구 `youtube` / YouTube URL은 로컬 mp4로(Edge·용량 대응 일원화) */
+    if (o.kind === "youtube" || parseYouTubeVideoId(url)) {
+      out.push({ id, ...HERO_LOCAL_DEFAULT_VIDEO });
+      continue;
+    }
+    const kind: HeroSlideKind =
+      o.kind === "video" || o.kind === "image" ? o.kind : inferHeroKind(url);
+    if (kind !== "video" && kind !== "image") continue;
     const mobileUrl = normalizeHeroMobileUrl(o.mobileUrl, kind);
     out.push({ id, url, kind, ...(mobileUrl ? { mobileUrl } : {}) });
   }

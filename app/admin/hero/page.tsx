@@ -7,6 +7,7 @@ import type { HeroSlide } from "@/lib/hero-types";
 import { parseYouTubeVideoId } from "@/lib/hero-youtube";
 import {
   HERO_ALLOWED_EXTENSIONS,
+  HERO_LOCAL_DEFAULT_VIDEO,
   extFromUrlOrPath,
   inferHeroKind,
   isAllowedHeroExtension,
@@ -24,20 +25,18 @@ function normalizeRemoteSlides(raw: unknown): HeroSlide[] {
     const o = item as Record<string, unknown>;
     const url = typeof o.url === "string" ? o.url.trim() : "";
     if (!url) continue;
-    let kind: HeroSlideKind =
-      o.kind === "video" || o.kind === "image" || o.kind === "youtube"
-        ? o.kind
-        : inferHeroKind(url);
-    if (parseYouTubeVideoId(url)) kind = "youtube";
-    if (kind === "youtube" && !parseYouTubeVideoId(url)) continue;
-    if (kind !== "youtube") {
-      const ext = extFromUrlOrPath(url);
-      if (!isAllowedHeroExtension(ext)) continue;
-    }
     const id =
       typeof o.id === "string" && o.id.trim()
         ? o.id.trim()
         : crypto.randomUUID();
+    if (o.kind === "youtube" || parseYouTubeVideoId(url)) {
+      out.push({ id, ...HERO_LOCAL_DEFAULT_VIDEO });
+      continue;
+    }
+    const kind: HeroSlideKind =
+      o.kind === "video" || o.kind === "image" ? o.kind : inferHeroKind(url);
+    const ext = extFromUrlOrPath(url);
+    if (!isAllowedHeroExtension(ext)) continue;
     let mobileUrl = normalizeHeroMobileUrl(o.mobileUrl, kind);
     if (kind === "video" && mobileUrl) {
       if (!isAllowedHeroExtension(extFromUrlOrPath(mobileUrl))) {
@@ -191,23 +190,22 @@ export default function AdminHeroPage() {
       setStatus("URL을 입력하세요.");
       return;
     }
-    const ytid = parseYouTubeVideoId(u);
-    if (ytid) {
+    if (parseYouTubeVideoId(u)) {
       const id = crypto.randomUUID();
       setSlides((prev) => [
         ...prev,
-        { id, url: u, kind: "youtube" as const },
+        { id, ...HERO_LOCAL_DEFAULT_VIDEO },
       ]);
       setUrlInput("");
       setStatus(
-        "YouTube 히어로로 추가되었습니다. Shorts(모바일) URL은 public/data/hero-slides.json의 mobileUrl에 넣을 수 있습니다.",
+        "YouTube URL은 히어로에 사용하지 않습니다. public/의 로컬 영상(hero_1.mp4, mobile_hero_1.mp4)으로 추가했습니다. 저장을 눌러 반영하세요.",
       );
       return;
     }
     const ext = extFromUrlOrPath(u);
     if (!isAllowedHeroExtension(ext)) {
       setStatus(
-        `URL이 YouTube가 아니면 확장자가 허용 목록에 있어야 합니다. (${HERO_ALLOWED_EXTENSIONS.join(", ")})`,
+        `확장자가 허용 목록에 있어야 합니다. (${HERO_ALLOWED_EXTENSIONS.join(", ")})`,
       );
       return;
     }
@@ -262,7 +260,8 @@ export default function AdminHeroPage() {
               히어로 미디어
             </h1>
             <p className="mt-2 text-sm text-zinc-400">
-              mp4, gif, webp, png, jpeg, jpg, YouTube(시청/Shorts URL) · 라이브 사이트는{" "}
+              mp4, gif, webp, png, jpeg, jpg · (구)YouTube URL은 자동으로 로컬
+              mp4(hero)로 바뀝니다 · 라이브 사이트는{" "}
               <code className="rounded bg-zinc-900 px-1 py-0.5 text-zinc-300">
                 /api/hero
               </code>{" "}
@@ -333,13 +332,14 @@ export default function AdminHeroPage() {
             <div>
               <p className="text-sm font-medium text-zinc-300">URL 직접 추가</p>
               <p className="mt-1 text-xs text-zinc-500">
-                YouTube watch·Shorts·youtu.be, 또는 이미지/동영상 공개 URL
+                이미지·동영상 URL 또는(구)YouTube 링크 — YouTube는 로컬 히어로
+                mp4로 저장됩니다
               </p>
               <div className="mt-2 flex gap-2">
                 <input
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
-                  placeholder="https://youtu.be/… 또는 /banner.webp"
+                  placeholder="https://…/banner.mp4 또는 /hero_1.mp4"
                   className="box-border min-h-12 min-w-0 flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm leading-normal outline-none ring-violet-500/40 focus:ring-2"
                 />
                 <button
@@ -361,27 +361,19 @@ export default function AdminHeroPage() {
               </li>
             ) : (
               slides.map((s, i) => {
-                const ytId = s.kind === "youtube" ? parseYouTubeVideoId(s.url) : null;
                 return (
                 <li
                   key={s.id}
                   className="flex flex-col gap-3 rounded-xl border border-white/10 bg-black/30 p-4 sm:flex-row sm:items-center"
                 >
                   <div className="h-24 w-full shrink-0 overflow-hidden rounded-lg bg-zinc-800 sm:h-20 sm:w-36">
-                    {s.kind === "youtube" ? (
-                      ytId ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={`https://i.ytimg.com/vi/${ytId}/mqdefault.jpg`}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-zinc-800" aria-hidden />
-                      )
-                    ) : s.kind === "video" ? (
+                    {s.kind === "video" || s.kind === "youtube" ? (
                       <video
-                        src={s.url}
+                        src={
+                          s.kind === "youtube"
+                            ? HERO_LOCAL_DEFAULT_VIDEO.url
+                            : s.url
+                        }
                         className="h-full w-full object-cover"
                         muted
                         playsInline
@@ -402,21 +394,15 @@ export default function AdminHeroPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium uppercase text-zinc-500">
-                      {s.kind === "video"
+                      {s.kind === "video" || s.kind === "youtube"
                         ? "video"
-                        : s.kind === "youtube"
-                          ? "youtube"
-                          : "image"}{" "}
-                      ·{" "}
-                      {s.kind === "youtube"
-                        ? "—"
-                        : extFromUrlOrPath(s.url) || "—"}
+                        : "image"}{" "}
+                      · {extFromUrlOrPath(s.url) || "—"}
                     </p>
                     <p className="mt-1 truncate font-mono text-xs text-zinc-400">
                       {s.url}
                     </p>
-                    {(s.kind === "video" || s.kind === "youtube") &&
-                    s.mobileUrl ? (
+                    {(s.kind === "video" || s.kind === "youtube") && s.mobileUrl ? (
                       <p className="mt-0.5 truncate font-mono text-xs text-zinc-500">
                         모바일: {s.mobileUrl}
                       </p>
