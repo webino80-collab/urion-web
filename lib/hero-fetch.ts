@@ -1,6 +1,16 @@
 import type { HeroConfig, HeroSlide } from "./hero-types";
 import { inferHeroKind, normalizeHeroMobileUrl } from "./hero-types";
 
+/** API·정적 JSON 모두 실패 시에도 히어로가 검은 화면만 나오지 않도록 (배포 경로와 동일한 기본 영상) */
+const FALLBACK_HERO_SLIDES: HeroSlide[] = [
+  {
+    id: "hero",
+    url: "/hero.mp4",
+    kind: "video",
+    mobileUrl: "/mobile_hero.mp4",
+  },
+];
+
 function normalizeSlides(raw: unknown): HeroSlide[] {
   if (!Array.isArray(raw)) return [];
   const out: HeroSlide[] = [];
@@ -59,5 +69,5 @@ export async function fetchHeroSlides(signal?: AbortSignal): Promise<{
     /* ignore */
   }
 
-  return { slides: [], source: "none" };
+  return { slides: FALLBACK_HERO_SLIDES, source: "none" };
 }

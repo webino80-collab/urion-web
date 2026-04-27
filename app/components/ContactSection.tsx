@@ -167,7 +167,10 @@ export function ContactSection({
                 >
                   {t.contact.directions}
                 </h3>
-                <p className="mt-3 text-base leading-relaxed text-zinc-300">
+                <p
+                  translate="no"
+                  className="contact-address-plain mt-3 text-base leading-relaxed text-zinc-300"
+                >
                   {site.address}
                 </p>
                 <a

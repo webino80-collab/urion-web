@@ -13,21 +13,28 @@ const IMAGE_DURATION_MS = 8000;
 /** Tailwind `lg` 미만 = 모바일·태블릿 히어로 영상 (`mobileUrl`) */
 const MOBILE_HERO_MQ = "(max-width: 1023px)";
 
+/**
+ * 모바일·데스크톱 영상 URL 선택.
+ * 이전 구현은 `slide`가 null→정의로 바뀔 때 `useState` 초깃값이 `""`로 고정되어
+ * 한동안 `src=""`인 비디오가 그려져 검은 화면만 보일 수 있었음 → `picked ?? slide.url`로 항상 유효한 src 보장.
+ */
 function useHeroVideoSrc(slide: HeroSlide | null): string {
-  const [src, setSrc] = useState(slide?.url ?? "");
+  const [picked, setPicked] = useState<string | null>(null);
 
   useLayoutEffect(() => {
     if (!slide) {
-      setSrc("");
+      setPicked(null);
       return;
     }
     if (slide.kind !== "video") {
-      setSrc(slide.url);
+      setPicked(slide.url);
       return;
     }
     const mq = window.matchMedia(MOBILE_HERO_MQ);
     const sync = () => {
-      setSrc(mq.matches && slide.mobileUrl ? slide.mobileUrl : slide.url);
+      setPicked(
+        mq.matches && slide.mobileUrl ? slide.mobileUrl : slide.url,
+      );
     };
     sync();
     mq.addEventListener("change", sync);
@@ -35,7 +42,8 @@ function useHeroVideoSrc(slide: HeroSlide | null): string {
   }, [slide?.id, slide?.kind, slide?.url, slide?.mobileUrl]);
 
   if (!slide) return "";
-  return slide.kind === "video" ? src : slide.url;
+  if (slide.kind !== "video") return slide.url;
+  return picked ?? slide.url;
 }
 
 type HeroBackdropProps = {
@@ -48,6 +56,8 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** 모바일 Safari 등: `autoPlay` 속성만으로는 무음 영상도 재생이 거절되는 경우가 있어 `play()`를 명시 호출 */
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  /** 모바일 전용 파일(404·코덱 불가 등) 실패 시 데스크톱 영상으로 폴백 */
+  const [mobileVideoFailed, setMobileVideoFailed] = useState(false);
 
   const activeIndex = count === 0 ? 0 : Math.min(index, count - 1);
 
@@ -71,7 +81,18 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
   }, [activeIndex, slides, count, goNext]);
 
   const slide = count === 0 ? null : slides[activeIndex]!;
-  const videoSrc = useHeroVideoSrc(slide);
+  const baseVideoSrc = useHeroVideoSrc(slide);
+  const videoSrc =
+    slide?.kind === "video" &&
+    slide.mobileUrl &&
+    mobileVideoFailed &&
+    baseVideoSrc === slide.mobileUrl
+      ? slide.url
+      : baseVideoSrc;
+
+  useEffect(() => {
+    setMobileVideoFailed(false);
+  }, [slide?.id, slide?.kind, baseVideoSrc]);
 
   useEffect(() => {
     if (!slide || slide.kind !== "video") return;
@@ -80,7 +101,6 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
 
     const ensurePlay = () => {
       v.muted = true;
-      v.defaultMuted = true;
       v.volume = 0;
       void v.play().catch(() => undefined);
     };
@@ -108,7 +128,7 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
         <video
           ref={heroVideoRef}
           key={`${slide.id}-${videoSrc}`}
-          className="absolute inset-0 h-full w-full scale-105 object-cover opacity-90"
+          className="absolute inset-0 h-full w-full scale-105 transform-gpu object-cover opacity-90 [backface-visibility:hidden]"
           src={videoSrc}
           muted
           playsInline
@@ -130,12 +150,22 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
           onEnded={() => {
             if (count > 1) goNext();
           }}
+          onError={() => {
+            if (
+              slide.kind === "video" &&
+              slide.mobileUrl &&
+              !mobileVideoFailed &&
+              baseVideoSrc === slide.mobileUrl
+            ) {
+              setMobileVideoFailed(true);
+            }
+          }}
         />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- 동적 URL·GIF·webp 등 비최적화 원본
         <img
           key={slide.id}
-          className="absolute inset-0 h-full w-full scale-105 object-cover opacity-90"
+          className="absolute inset-0 h-full w-full scale-105 transform-gpu object-cover opacity-90 [backface-visibility:hidden]"
           src={slide.url}
           alt=""
           decoding="async"

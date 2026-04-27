@@ -233,7 +233,7 @@ export default function AdminHeroPage() {
   const acceptAttr = HERO_ALLOWED_EXTENSIONS.map((e) => `.${e}`).join(",");
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-10 text-zinc-100 sm:px-8">
+    <div className="min-h-dvh bg-zinc-950 px-4 py-10 text-zinc-100 sm:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>

@@ -34,6 +34,32 @@ body {
   /* 고연령 가독성: 본문 18px·행간 1.6 */
   font-size: 1.125rem;
   line-height: 1.6;
+  color-scheme: dark;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- 크로스 브라우저·모바일 공통 baseline ---------- */
+html {
+  color-scheme: dark;
+  /* iOS/안드로이드: 가로 전환·줌 후 본문 글자만 부풀어 보이는 현상 완화 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html[lang="ko"] body {
+  /* 한글 줄바꿈: WebKit vs Blink 간 단어 경계 처리 통일 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+::selection {
+  background-color: rgba(139, 92, 246, 0.35);
+  color: inherit;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
 }
 
 /* 히어로 배경: 마우스 휠 스크롤 유도 */
@@ -74,4 +100,13 @@ body {
     animation: none;
     opacity: 0.55;
   }
+}
+
+/* Chrome(특히 Android): 본문을 주소로 감지해 <a>+점선 밑줄을 씌울 때 — 사파리는 감지가 약하거나 meta로 막히는 편 */
+.contact-address-plain,
+.contact-address-plain a {
+  text-decoration: none !important;
+}
+.contact-address-plain a {
+  color: inherit !important;
 }

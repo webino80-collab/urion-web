@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { I18nProvider } from "@/app/components/I18nProvider";
 import "./globals.css";
 
@@ -9,6 +9,20 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
+  },
+};
+
+/** 모바일 주소창·노치·테마색 일치 — Blink/WebKit 간 체감 차이 완화 */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#000000",
+  colorScheme: "dark",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
