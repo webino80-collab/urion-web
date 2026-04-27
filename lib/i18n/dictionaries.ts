@@ -19,12 +19,8 @@ export type Messages = {
     ctaContact: string;
   };
   about: {
-    /** 오른쪽 열 첫 문단: 한글 미션 (missionKoHighlight는 흰색 강조) */
-    missionKoBefore: string;
-    missionKoHighlight: string;
-    missionKoAfter: string;
-    /** 오른쪽 열: 영문 미션 (항상 표시) */
-    missionEn: string;
+    /** CEO 소개 — 한글 문단 (줄바꿈은 배열 요소로 구분) */
+    missionKoParagraphs: string[];
     ceoAlt: string;
     close: string;
     closeAria: string;
@@ -73,8 +69,8 @@ export type Messages = {
     /** 왼쪽 열: 흰색 disc 메인 + 번호 하위(개요와 동일 disc, 하위는 회색) */
     advantagesItems: { heading: string; subpoints: string[] }[];
     resinTitle: string;
-    /** 오른쪽 열: 수지 불릿 [0]=도식 위, [1]=도식 아래 */
-    resinBullets: [string, string];
+    /** 오른쪽 열: 수지 본문 불릿 (도식 상단 한 덩어리) */
+    resinBullets: string[];
     pinTitle: string;
     pinProcessBullets: string[];
     tech01Alt: string;
@@ -97,11 +93,10 @@ const ko: Messages = {
     ctaContact: "지금 문의하기",
   },
   about: {
-    missionKoBefore: "유리온은 ",
-    missionKoHighlight: "유리 코어 기판 기술",
-    missionKoAfter: "의 새로운 시대를 열어갈 것이다.",
-    missionEn:
-      "U:RION will usher in a new era of glass core substrate technology.",
+    missionKoParagraphs: [
+      "(주)유리온의 이성재 대표이사는 한국화학연구원, 삼성전기,\n와이엠티를 거쳤으며 40여 년 이상 반도체 패키징 분야에서 연구 및 개발을 해왔습니다.",
+      "유리 기판 TGV의 혁신적인 기술을 개발했으며, 반도체 패키징의 미래 발전을 위한 선봉장이 될 것입니다.",
+    ],
     ceoAlt: "유리온 대표",
     close: "닫기",
     closeAria: "닫기",
@@ -141,11 +136,12 @@ const ko: Messages = {
   },
   tpf: {
     ariaLabel: "TPF 정밀 제조 프로세스",
-    title: "Precision Manufacturing Process",
-    overviewTitle: "TPF 기술의 개요",
+    title:
+      "유리 기판 관통 전극(Through Glass Via)의 혁신적인 기술로 유리 기판의 새로운 시대를 열어갑니다.",
+    overviewTitle: "TPF(TGV Pin Fill) 기술의 개요",
     overviewBullets: [
-      "TPF는 도금방식 대신 구리 핀을 직접 삽입하는 방식입니다.",
-      "유리 기판 관통홀 TGV(Through Glass Via)의 내부를 구리로 채우는 방법에 있어 기존에는 전기도금 방식으로 진행하고 있습니다.",
+      "기존의 TGV(Through Glass Via)공정은 내부를 구리로 채우는 방법에 있어 전기도금 방식으로 진행",
+      "TPF(TGV Pin Fill)는 도금방식 대신 유리 기판에 금속 핀을 직접 삽입하는 방식",
     ],
     advantagesTitle: "TPF 기술의 장점",
     advantagesItems: [
@@ -165,7 +161,8 @@ const ko: Messages = {
         ],
       },
       {
-        heading: "도금 시 발생하는 불량 문제가 없습니다.",
+        heading:
+          "TGV 도금 방식과 비교해서 높은 공정 수율과 양산성 확보가 가능합니다.",
         subpoints: [
           "도금 불균일 및 Void 발생 문제 없음",
           "홀 막힘 문제가 발생하지 않음",
@@ -179,7 +176,7 @@ const ko: Messages = {
       },
       {
         heading:
-          "도금과 비교해서 공정이 간단하고 고가의 장비 불필요합니다.",
+          "TGV 도금 방식과 비교해서 높은 공정 수율과 양산성 확보가 가능합니다.",
         subpoints: [
           "도금 대비 높은 수율 및 양산성 가능",
           "도금 대비 낮은 공정비용",
@@ -189,12 +186,11 @@ const ko: Messages = {
     resinTitle: "수지 (Resin)",
     resinBullets: [
       "TPF 공정에 적용되는 수지(Resin)는 전체 유리기판 보호, 비아홀 내부 충격완화, 마이크로 크랙의 방지 및 발생된 마이크로 크랙의 확산 방지 목적",
-      "1차 코팅 수지와 2차 충진 수지는 점도가 다르게 적용되나, 동일한 Epoxy계를 기반으로 하여 밀착력을 확보",
     ],
     pinTitle: "다중 비아홀 동시 핀 삽입 공정",
     pinProcessBullets: [
-      "100 × 100 mm 기준 유리 기판의 경우 약 2천개에서 4만개 사이의 비아홀이 구성",
-      "양산성 확보를 위해 패키지 기판 크기 또는 Strip 단위로 동시 삽입",
+      "유리 기판 내 다중 홀에 대해 금속핀을 동시에 삽입 진행",
+      "양산성 확보를 위해 패키지 기판 크기 또는 Strip단위로 진행",
     ],
     tech01Alt: "Glass·TGV·수지층·메탈 핀 단면 구조 도식",
     pinGifAlt: "TPF 핀 어레이 3D 개요",
@@ -216,11 +212,10 @@ const en: Messages = {
     ctaContact: "Get in touch",
   },
   about: {
-    missionKoBefore: "유리온은 ",
-    missionKoHighlight: "유리 코어 기판 기술",
-    missionKoAfter: "의 새로운 시대를 열어갈 것이다.",
-    missionEn:
-      "U:RION will usher in a new era of glass core substrate technology.",
+    missionKoParagraphs: [
+      "(주)유리온의 이성재 대표이사는 한국화학연구원, 삼성전기,\n와이엠티를 거쳤으며 40여 년 이상 반도체 패키징 분야에서 연구 및 개발을 해왔습니다.",
+      "유리 기판 TGV의 혁신적인 기술을 개발했으며, 반도체 패키징의 미래 발전을 위한 선봉장이 될 것입니다.",
+    ],
     ceoAlt: "U:RION leadership",
     close: "Close",
     closeAria: "Close",
@@ -261,10 +256,10 @@ const en: Messages = {
   tpf: {
     ariaLabel: "TPF precision manufacturing process",
     title: "Precision Manufacturing Process",
-    overviewTitle: "TPF technology overview",
+    overviewTitle: "TPF (TGV Pin Fill) technology overview",
     overviewBullets: [
-      "TPF inserts copper pins directly instead of using a plating-based approach.",
-      "For filling through-glass vias (TGVs) in glass panels with copper,\nelectroplating has been the conventional path; TPF offers a pin-first alternative.",
+      "Conventional TGV (Through Glass Via) processes fill vias with copper using electroplating.",
+      "TPF (TGV Pin Fill) inserts metal pins directly into the glass substrate instead of using plating.",
     ],
     advantagesTitle: "Benefits of TPF",
     advantagesItems: [
@@ -284,7 +279,8 @@ const en: Messages = {
         ],
       },
       {
-        heading: "No plating-related defect modes.",
+        heading:
+          "Compared with TGV plating, higher process yield and mass-production scalability are achievable.",
         subpoints: [
           "No non-uniform plating or void formation",
           "No blocked-hole issues",
@@ -298,7 +294,7 @@ const en: Messages = {
       },
       {
         heading:
-          "Simpler flow than plating, with less high-end equipment required.",
+          "Compared with TGV plating, higher process yield and mass-production scalability are achievable.",
         subpoints: [
           "Higher yield and mass-production potential versus plating",
           "Lower process cost than plating",
@@ -308,12 +304,11 @@ const en: Messages = {
     resinTitle: "Resin",
     resinBullets: [
       "In the TPF process, resin protects the full glass panel, cushions the inside of vias, prevents micro-cracks, and stops any micro-cracks that do form from spreading.",
-      "The first coating resin and second fill resin are applied at different viscosities but share the same epoxy family to secure adhesion and sealing performance.",
     ],
     pinTitle: "Simultaneous pin insertion for multiple vias",
     pinProcessBullets: [
-      "On a 100 × 100 mm glass panel, roughly two thousand to forty thousand via holes can be formed.",
-      "Pins are inserted simultaneously by package panel size or strip unit to secure mass-production throughput.",
+      "Metal pins are inserted simultaneously into multiple holes across the glass substrate.",
+      "Processing proceeds by package panel size or strip unit to secure mass-production throughput.",
     ],
     tech01Alt: "Cross-section: glass, TGV, resin layers, and metal pin",
     pinGifAlt: "3D overview of the TPF pin array",

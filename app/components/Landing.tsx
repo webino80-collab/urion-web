@@ -80,8 +80,6 @@ function touchTargetAllowsHorizontalScroll(
 const SLIDE_DURATION_MS = 700;
 const WHEEL_DELTA_THRESHOLD = 40;
 const SWIPE_PX_THRESHOLD = 56;
-/** 모바일(`max-lg`): 히어로는 헤더 배경 없음 — 내부 스크롤이 이 값(px)을 넘기면 반투명 헤더 표시 */
-const MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX = 24;
 
 export function Landing() {
   const { t } = useI18n();
@@ -89,8 +87,6 @@ export function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
-  /** `max-lg` 전용: 히어로 제외, 스크롤 깊이에 따라 헤더 반투명 배경 */
-  const [mobileHeaderFill, setMobileHeaderFill] = useState(false);
   const slideLockRef = useRef(false);
   const slideIndexRef = useRef(0);
   const contactScrollRef = useRef<HTMLDivElement | null>(null);
@@ -100,63 +96,6 @@ export function Landing() {
   useEffect(() => {
     slideIndexRef.current = slideIndex;
   }, [slideIndex]);
-
-  const syncMobileHeaderFillFromScroll = useCallback(() => {
-    const i = slideIndexRef.current;
-    if (i === 0) {
-      setMobileHeaderFill(false);
-      return;
-    }
-    if (i === 1) {
-      const el = document.querySelector<HTMLElement>(
-        "[data-tpf-mobile-scroll]",
-      );
-      setMobileHeaderFill(
-        !!el && el.scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
-      );
-      return;
-    }
-    if (i === 2) {
-      const el = contactScrollRef.current;
-      setMobileHeaderFill(
-        !!el && el.scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
-      );
-    }
-  }, []);
-
-  useEffect(() => {
-    if (slideIndex === 0) {
-      setMobileHeaderFill(false);
-      return;
-    }
-    const id = requestAnimationFrame(() => syncMobileHeaderFillFromScroll());
-    return () => cancelAnimationFrame(id);
-  }, [slideIndex, syncMobileHeaderFillFromScroll]);
-
-  useEffect(() => {
-    if (slideIndex !== 2) return;
-    const el = contactScrollRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      if (slideIndexRef.current !== 2) return;
-      setMobileHeaderFill(
-        el.scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
-      );
-    };
-    onScroll();
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
-  }, [slideIndex]);
-
-  const onTpfMobileScrollRegionScroll = useCallback(
-    (scrollTop: number) => {
-      if (slideIndexRef.current !== 1) return;
-      setMobileHeaderFill(
-        scrollTop > MOBILE_HEADER_FILL_SCROLL_THRESHOLD_PX,
-      );
-    },
-    [],
-  );
 
   const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
 
@@ -341,13 +280,7 @@ export function Landing() {
   return (
     <>
       {/* 상단 고정: 슬라이드 전환 시에도 동일 위치 */}
-      <header
-        className={`pointer-events-auto fixed inset-x-0 top-0 z-[90] flex items-center justify-between gap-4 px-6 py-4 pt-[max(1rem,env(safe-area-inset-top))] transition-[background-color,border-color,backdrop-filter] duration-300 sm:px-10 lg:border-b lg:border-white/[0.07] lg:bg-zinc-950/80 lg:backdrop-blur-md lg:backdrop-saturate-150 ${
-          mobileHeaderFill
-            ? "max-lg:border-b max-lg:border-white/[0.07] max-lg:bg-zinc-950/80 max-lg:backdrop-blur-md max-lg:backdrop-saturate-150"
-            : "max-lg:border-b max-lg:border-transparent max-lg:bg-transparent max-lg:backdrop-blur-none"
-        }`}
-      >
+      <header className="pointer-events-auto fixed inset-x-0 top-0 z-[90] flex items-center justify-between gap-4 bg-transparent px-6 py-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-10">
         <button
           type="button"
           onClick={goHome}
@@ -465,9 +398,7 @@ export function Landing() {
             className="relative flex h-dvh min-h-0 shrink-0 flex-col overflow-hidden bg-black"
             aria-label={t.tpf.ariaLabel}
           >
-            <TpfProcessSection
-              onMobileScrollRegionScroll={onTpfMobileScrollRegionScroll}
-            />
+            <TpfProcessSection />
           </section>
 
           <section

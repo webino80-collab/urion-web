@@ -72,7 +72,7 @@ export function AboutOverlay() {
           </div>
         </div>
 
-        <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,12rem)_1fr] lg:items-start">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,12rem)_1fr] lg:items-center lg:gap-10">
           <div className="flex flex-col items-center lg:items-stretch">
             <div className="relative aspect-square w-full max-w-[12rem] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 lg:max-w-none">
               <Image
@@ -86,15 +86,17 @@ export function AboutOverlay() {
             </div>
           </div>
 
-          <div className="min-w-0 pt-2 text-left lg:pt-10">
-            <p className="text-base leading-relaxed text-zinc-400 sm:text-base">
-              {t.about.missionKoBefore}
-              <span className="text-white">{t.about.missionKoHighlight}</span>
-              {t.about.missionKoAfter}
-            </p>
-            <p className="mt-4 text-base leading-relaxed text-zinc-400 sm:text-base">
-              {t.about.missionEn}
-            </p>
+          <div className="min-w-0 pt-2 text-left lg:pt-0">
+            {t.about.missionKoParagraphs.map((para, i) => (
+              <p
+                key={`about-ko-${i}`}
+                className={`whitespace-pre-line break-keep text-[1.125rem] leading-[1.6] text-zinc-300 ${
+                  i > 0 ? "mt-4" : ""
+                }`}
+              >
+                {para}
+              </p>
+            ))}
           </div>
         </div>
       </div>
