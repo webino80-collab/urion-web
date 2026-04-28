@@ -191,7 +191,7 @@ export function TpfProcessSection() {
             <CeoMessageRichText
               paragraphs={t.about.missionParagraphs}
               className="space-y-5"
-              paragraphClassName="whitespace-normal break-keep break-words text-left text-[14px] font-normal leading-[1.75] text-zinc-100 antialiased"
+              paragraphClassName="whitespace-normal break-keep break-words text-left text-[16px] font-normal leading-[1.75] text-zinc-100 antialiased"
               strongClassName="font-bold text-white"
             />
           </div>
