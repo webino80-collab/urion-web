@@ -173,6 +173,9 @@ export function ContactSection({
                 >
                   {site.address}
                 </p>
+                <p className="mt-2 text-base font-bold leading-relaxed text-zinc-200">
+                  (주) 유리온
+                </p>
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`}
                   target="_blank"
