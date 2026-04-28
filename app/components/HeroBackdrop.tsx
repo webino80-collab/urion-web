@@ -121,7 +121,7 @@ export function HeroBackdrop({ slides }: HeroBackdropProps) {
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
       aria-hidden
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/65" />
+      <div className="absolute inset-0 bg-gradient-to-b from-landing-page/70 via-landing-page/45 to-landing-page/65" />
       {slide.kind === "video" ? (
         // 배경: 무음·autoplay(Edge/Chrome: H.264+AAC MP4 권장, HEVC는 Windows에 따라 실패)
         <video

@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 // import { LanguageSwitcher } from "./LanguageSwitcher";
+import { CeoMessageRichText } from "./CeoMessageRichText";
 import { useI18n } from "./I18nProvider";
 
 export function AboutOverlay() {
@@ -79,7 +80,7 @@ export function AboutOverlay() {
                 src="/images/ceo3.webp"
                 alt={t.about.ceoAlt}
                 fill
-                sizes="(max-width: 1024px) 192px, 192px"
+                sizes="12rem"
                 className="object-cover object-top"
                 priority
               />
@@ -87,16 +88,12 @@ export function AboutOverlay() {
           </div>
 
           <div className="min-w-0 pt-2 text-left lg:pt-0">
-            {t.about.missionKoParagraphs.map((para, i) => (
-              <p
-                key={`about-ko-${i}`}
-                className={`whitespace-pre-line break-keep text-[1.125rem] leading-[1.6] text-zinc-300 ${
-                  i > 0 ? "mt-4" : ""
-                }`}
-              >
-                {para}
-              </p>
-            ))}
+            <CeoMessageRichText
+              paragraphs={t.about.missionParagraphs}
+              className="space-y-4"
+              paragraphClassName="whitespace-normal break-keep break-words text-[1.125rem] leading-[1.6] text-zinc-300"
+              strongClassName="font-bold text-zinc-100"
+            />
           </div>
         </div>
       </div>

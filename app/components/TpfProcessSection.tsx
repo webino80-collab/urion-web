@@ -1,353 +1,316 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import Image from "next/image";
+import {
+  MAX_CONTENT_WIDTH_PX,
+  TPF_DIAGRAM_MAX_CSS_PX,
+} from "@/lib/design-tokens";
 import type { Messages } from "@/lib/i18n/dictionaries";
 import { useI18n } from "./I18nProvider";
+import { CeoMessageRichText } from "./CeoMessageRichText";
 import { PinGifPlayer } from "./PinGifPlayer";
-
-/**
- * TPF 섹션 — 반응형 규약
- * - **PC(고정 기준)**: `lg`(≥1024px) 이상에서 확정된 레이아웃·타이포. 여기 손댈 땐 PC 너비에서 회귀 확인.
- * - **모바일**: `< lg` — 상단 h2·배경 유지, 본문은 **세로 스크롤 한 열**(개요 → 장점 → 수지 → 다중비아 순).
- * - 공통 상수(`tpfDiscListCore` 등)를 바꿀 때는 모바일·PC 둘 다 확인.
- *
- * 그리드 최대 너비(디자인 기준 1920) — PC 3열: 장점 | 개요·pin | 수지·tech01·다중비아
- */
-const CONTENT_MAX = "min(100%,1920px)";
-
-const HERO_BG = "/bg.webp";
-const HERO_BG_POSITION = "center 30%";
-
-const tpfHeadingClass =
-  "font-sans text-[22px] font-bold leading-snug tracking-tight text-white";
-
-/**
- * TPF 메인 헤드라인 — 보라→핑크 그라데이션 + 은은한 발광(어두운 배경·기술 패턴 위 가독성·계층감).
- * `bg-clip-text`는 제목 전용이며, 본문 디스크 리스트 등에는 사용하지 않음.
- */
-const tpfMainHeadlineVisualClass =
-  "bg-gradient-to-r from-[#F5EEFF] via-[#E879F9] to-[#FDA4AF] bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(232,121,249,0.22)] sm:drop-shadow-[0_0_36px_rgba(232,121,249,0.28)]";
-
-const tpfDiscListCore =
-  "list-outside list-disc space-y-4 pl-5 text-left text-[18px] font-normal leading-[1.6] break-keep text-white marker:text-white sm:space-y-5 sm:pl-5 [&>li]:pl-0.5";
-
-/** 장점 목록: 항목 간 `space-y` 대신 패딩 + 구분선으로 구획 */
-const tpfAdvantagesListClass =
-  "list-outside list-disc pl-5 text-left text-[18px] font-normal leading-[1.6] break-keep text-white marker:text-white sm:pl-5 [&>li]:pl-0.5";
-
-/** `list-outside` + 상위 `overflow-hidden`(아코디언 애니메이션)이면 iOS에서 번호 마커가 잘림 → `list-inside` */
-const tpfNumberedSublistCoreClass =
-  "list-inside list-decimal space-y-1.5 pl-4 text-left text-[14px] font-normal leading-[1.6] break-keep text-zinc-400 marker:text-zinc-500 sm:space-y-2 sm:pl-5";
 
 type TpfDict = Messages["tpf"];
 
-function idMobile(base: string, mobile: boolean) {
-  return mobile ? `${base}-m` : base;
-}
+const CONTAINER_CLASS =
+  "mx-auto w-full px-4 sm:px-6 md:px-8 lg:px-10";
 
-function TextColumn({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
+/** 1200px 데스크톱; 이미지 에셋은 2x → `sizes`로 DPR 2에 맞는 요청 (논리 픽셀 기준) */
+const SIZES_FULL_1200 = `(min-width: ${MAX_CONTENT_WIDTH_PX}px) ${MAX_CONTENT_WIDTH_PX}px, 100vw`;
+const SIZES_DIAGRAM_1200 = `(min-width: ${MAX_CONTENT_WIDTH_PX}px) ${TPF_DIAGRAM_MAX_CSS_PX}px, (min-width: 768px) 85vw, 100vw`;
+const SIZES_TPF_DECOR = "100vw";
 
-function TpfTitleRow({ children }: { children: ReactNode }) {
-  return <div className="min-w-0">{children}</div>;
-}
+const tpfH3 =
+  "text-left font-sans text-[22px] font-bold leading-snug tracking-tight text-white";
+const tpfBody =
+  "list-outside list-disc pl-5 text-left text-lg font-normal leading-[1.6] break-keep text-zinc-100 marker:text-white sm:pl-5 [&>li]:pl-0.5";
+const tpfSubNumbered =
+  "list-inside list-decimal space-y-1.5 pl-3 text-left text-sm font-normal leading-[1.6] break-keep text-zinc-400 sm:pl-4";
 
-const tpfMobileScrollHide =
-  "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:h-0 [&::-webkit-scrollbar]:w-0";
-
-/** 모바일 세로 스크롤 본문 안의 한 블록 (구 가로 슬라이드 1칸 분량). 상단 구분선은 부모의 `[&>section+section]`으로만 줌(첫 블록은 제목 div 뒤라 `first:` 불가). */
-function TpfMobileScrollBlock({ children }: { children: ReactNode }) {
-  return (
-    <section className="px-6 py-10 sm:px-10 sm:py-12">{children}</section>
-  );
-}
-
-function TpfOverviewContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
-  const hid = idMobile("tpf-overview-heading", mobile);
-  return (
-    <>
-      <TpfTitleRow>
-        <h3 id={hid} className={tpfHeadingClass}>
-          {p.overviewTitle}
-        </h3>
-        <ul
-          className={`mt-5 sm:mt-6 ${tpfDiscListCore}`}
-          aria-labelledby={hid}
-        >
-          {p.overviewBullets.map((line, i) => (
-            <li key={`ov-${mobile ? "m" : "d"}-${i}`} className="whitespace-pre-line">
-              {line}
-            </li>
-          ))}
-        </ul>
-      </TpfTitleRow>
-      <div className="mt-[20px] flex min-h-0 flex-1 items-start justify-start max-lg:mt-6 max-lg:flex-none max-lg:min-h-0">
-        <div className="flex max-h-full w-full max-w-[min(100%,26rem)] items-start justify-start overflow-hidden p-3 sm:p-4 max-lg:max-h-none max-lg:max-w-none max-lg:justify-center">
-          <PinGifPlayer
-            src="/pin.gif"
-            alt={p.pinGifAlt}
-            className="max-h-[min(22dvh,14rem)] w-auto max-w-full object-contain sm:max-h-[min(26dvh,16rem)] lg:max-h-[min(30dvh,17rem)]"
-          />
-        </div>
-      </div>
-    </>
-  );
-}
-
-function TpfAdvantagesContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
-  const hid = idMobile("tpf-advantages-heading", mobile);
-  /** 하위 목록이 있는 항목: `+`로 접기/펼치기, 한 번에 하나만 열림 (`null` = 전부 닫힘) */
+function TpfAdvantagesList({ p }: { p: TpfDict }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-
   return (
-    <TpfTitleRow>
-      <h3 id={hid} className={tpfHeadingClass}>
-        {p.advantagesTitle}
-      </h3>
-      <ul
-        className={`mt-5 sm:mt-6 ${tpfAdvantagesListClass} ${mobile ? "" : "min-h-0 flex-1 overflow-hidden"}`}
-        aria-labelledby={hid}
-      >
-        {p.advantagesItems.map((item, i) => {
-          const subId = `adv-sub-${mobile ? "m" : "d"}-${i}`;
-          const hasSubs = item.subpoints.length > 0;
-          const expanded = hasSubs && openIndex === i;
-          /** 희미한 가로 구분선 — 모바일 섹션 구분선(`border-white/10`)과 동일 톤 */
-          const advItemSep =
-            i === 0 ? "pb-4 sm:pb-5" : "border-t border-white/10 pt-4 pb-4 sm:pt-5 sm:pb-5";
-
-          return (
-            <li key={`adv-${mobile ? "m" : "d"}-${i}`} className={advItemSep}>
-              {hasSubs ? (
-                <button
-                  type="button"
-                  className="flex min-h-12 w-full items-center justify-between gap-3 rounded-sm py-2 text-left text-[18px] font-normal leading-[1.6] text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70"
-                  aria-expanded={expanded}
-                  aria-controls={subId}
-                  onClick={() =>
-                    setOpenIndex((cur) => (cur === i ? null : i))
-                  }
-                >
-                  <span className="min-w-0 flex-1 whitespace-pre-line pr-1">
-                    {item.heading}
-                  </span>
-                  <span
-                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-white/35 text-base font-semibold leading-none text-white transition-colors hover:border-white/55 tabular-nums sm:size-12"
-                    aria-hidden
+    <ul className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50">
+      {p.advantagesItems.map((item, i) => {
+        const hasSubs = item.subpoints.length > 0;
+        const expanded = hasSubs && openIndex === i;
+        return (
+          <li
+            key={`adv-${i}`}
+            className="border-b border-white/10 last:border-b-0"
+          >
+            {hasSubs ? (
+              <>
+                <div className="flex min-h-12 items-center gap-3 px-4 py-5 sm:min-h-14 sm:px-5 sm:py-5">
+                  <button
+                    type="button"
+                    className="min-w-0 flex-1 text-left text-lg font-normal leading-[1.6] text-white transition-[background-color] hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500/60"
+                    aria-expanded={expanded}
+                    onClick={() => {
+                      if (!expanded) setOpenIndex(i);
+                    }}
+                  >
+                    <span className="break-keep whitespace-pre-line pr-1">
+                      {item.heading}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/30 text-lg font-light leading-none text-white tabular-nums transition-colors hover:bg-white/[0.06] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                    aria-label={expanded ? "collapse item" : "expand item"}
+                    onClick={() =>
+                      setOpenIndex((cur) => (cur === i ? null : i))
+                    }
                   >
                     {expanded ? "−" : "+"}
-                  </span>
-                </button>
-              ) : (
-                <p className="whitespace-pre-line text-[18px] font-normal leading-[1.6] text-white">
-                  {item.heading}
-                </p>
-              )}
-              {hasSubs ? (
+                  </button>
+                </div>
                 <div
-                  className={`grid overflow-hidden transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${
+                  className={`grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none ${
                     expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                   }`}
                 >
                   <div className="min-h-0 overflow-hidden">
-                    <div className="pt-2.5 sm:pt-3">
-                      <ol
-                        id={subId}
-                        className={tpfNumberedSublistCoreClass}
-                        aria-hidden={!expanded}
-                      >
-                        {item.subpoints.map((line, j) => (
-                          <li key={`adv-${mobile ? "m" : "d"}-${i}-sub-${j}`}>
-                            {line}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
+                    <ol
+                      className={`border-t border-white/5 px-4 pb-5 pt-5 pl-[20px] sm:px-5 sm:pb-5 sm:pt-5 sm:pl-[20px] ${tpfSubNumbered}`}
+                    >
+                      {item.subpoints.map((line, j) => (
+                        <li key={`adv-sub-${i}-${j}`}>{line}</li>
+                      ))}
+                    </ol>
                   </div>
                 </div>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-    </TpfTitleRow>
-  );
-}
-
-function TpfResinContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
-  const hid = idMobile("tpf-resin-heading", mobile);
-  return (
-    <TpfTitleRow>
-      <h3 id={hid} className={tpfHeadingClass}>
-        {p.resinTitle}
-      </h3>
-      <ul className={`mt-5 sm:mt-6 ${tpfDiscListCore}`} aria-labelledby={hid}>
-        {p.resinBullets.map((line, i) => (
-          <li key={`${mobile ? "m" : "d"}-resin-${i}`}>{line}</li>
-        ))}
-      </ul>
-      <div
-        className={`relative h-[min(16dvh,9rem)] w-full max-w-lg shrink-0 overflow-hidden sm:h-[min(18dvh,10rem)] lg:h-[min(20dvh,10.5rem)] xl:h-[min(22dvh,11.5rem)] max-lg:mx-auto max-lg:max-w-none ${
-          mobile ? "my-[20px]" : "mt-0"
-        }`}
-      >
-        <Image
-          src="/tech01.webp"
-          alt={p.tech01Alt}
-          fill
-          className="border-0 object-contain px-3 sm:px-4 py-0"
-          sizes="(max-width: 1024px) 100vw, 33vw"
-        />
-      </div>
-    </TpfTitleRow>
-  );
-}
-
-function TpfMultiViaContent({ p, mobile }: { p: TpfDict; mobile: boolean }) {
-  const hid = idMobile("tpf-pin-heading", mobile);
-  return (
-    <TpfTitleRow>
-      <h3 id={hid} className={tpfHeadingClass}>
-        {p.pinTitle}
-      </h3>
-      <ul className={`mt-5 sm:mt-6 ${tpfDiscListCore}`} aria-labelledby={hid}>
-        {p.pinProcessBullets.map((line, i) => (
-          <li key={`pin-${mobile ? "m" : "d"}-${i}`} className="whitespace-pre-line">
-            {line}
+              </>
+            ) : (
+              <div className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 sm:min-h-14 sm:px-5 sm:py-4">
+                <p className="min-w-0 flex-1 text-left text-lg font-normal leading-[1.6] break-keep text-white">
+                  {item.heading}
+                </p>
+                <span
+                  className="inline-flex size-10 shrink-0 items-center justify-center opacity-0"
+                  aria-hidden
+                >
+                  +
+                </span>
+              </div>
+            )}
           </li>
-        ))}
-      </ul>
-    </TpfTitleRow>
+        );
+      })}
+    </ul>
   );
 }
 
-function TpfMainHeading({ p }: { p: TpfDict }) {
-  return (
-    <div className="w-full max-w-[min(90%,52rem)]">
-      <h2
-        className={`text-left font-sans text-[32px] font-light leading-[1.22] tracking-[0.035em] sm:tracking-[0.04em] lg:text-center lg:text-[34px] xl:text-[36px] ${tpfMainHeadlineVisualClass}`}
-      >
-        {p.title}
-      </h2>
-      {/* 시선 마무리용 얇은 악센트 라인 — 중앙 정렬 구간과 모바일 좌측 정렬 모두 대응 */}
-      <div
-        className="mt-5 h-px max-w-[5rem] bg-gradient-to-r from-violet-400/60 via-fuchsia-400/80 to-pink-300/55 sm:mt-6 sm:max-w-[6rem] lg:mx-auto lg:mt-7"
-        aria-hidden
-      />
-    </div>
-  );
-}
-
+/**
+ * 랜딩 히어로 바로 아래: CEO 라이트 톤 카드 → TGV 헤드라인 → TPF 개요(일러+텍스트) → 장점 아코디언 → 수지·다중비아.
+ * · Max container 1200px / 태블릿·모바일 한 열 (워크스페이스 그리드 규약)
+ */
 export function TpfProcessSection() {
   const { t } = useI18n();
   const p = t.tpf;
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-black font-sans text-white">
-      {/* PC만: 섹션 높이(h-dvh)에 맞춰 고정 배경. 모바일은 아래 스크롤 래퍼 안에서 같이 움직임 */}
+    <div className="relative overflow-hidden bg-landing-page font-sans text-zinc-100">
       <div
-        className="pointer-events-none absolute inset-0 z-0 hidden bg-cover bg-no-repeat lg:block"
-        style={{
-          backgroundImage: `url("${HERO_BG}")`,
-          backgroundPosition: HERO_BG_POSITION,
-        }}
+        className="pointer-events-none absolute inset-0 z-0 opacity-30"
+        aria-hidden
+      >
+        <Image
+          src="/bg.webp"
+          alt=""
+          fill
+          className="object-cover object-center"
+          sizes={SIZES_TPF_DECOR}
+          quality={80}
+        />
+      </div>
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-landing-page/45 via-landing-page/80 to-landing-page"
         aria-hidden
       />
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] hidden bg-gradient-to-b from-black/30 via-black/65 to-black/[0.93] lg:block"
-        aria-hidden
-      />
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        {/* 모바일: 제목 + 본문 한 덩어리로 세로 스크롤 */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:hidden">
-          <div
-            data-tpf-mobile-scroll
-            className={`min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch] ${tpfMobileScrollHide}`}
-            role="region"
-            aria-label={p.title}
+
+      <div className="relative z-10">
+        <div
+          className={`${CONTAINER_CLASS} space-y-14 pb-12 pt-[100px] sm:space-y-20 sm:py-16 md:space-y-24 md:pb-20 md:pt-[160px]`}
+          style={{ maxWidth: MAX_CONTENT_WIDTH_PX }}
+        >
+          <h2
+            className="mb-8 text-left text-[32px] font-bold leading-10 tracking-[-0.02em] md:hidden"
+            aria-label={`${p.ceoMessageTitleCeo} ${p.ceoMessageTitleMessage}`}
           >
-            {/* 배경은 고정 slab만 `cover`+`center 30%`(PC와 동일). 전체 스크롤 높이에 맞추면 확대·잘림; 100dvh만 두면 GIF 아래가 검게 끊김 → slab을 약간 키움 */}
-            <div className="relative isolate w-full">
-              <div
-                className="pointer-events-none absolute left-0 right-0 top-0 z-0 h-[min(132dvh,920px)] bg-cover bg-no-repeat"
-                style={{
-                  backgroundImage: `url("${HERO_BG}")`,
-                  backgroundPosition: HERO_BG_POSITION,
-                }}
-                aria-hidden
+            <span className="text-white">{p.ceoMessageTitleCeo}</span>
+            <span className="text-[#B8B8B8]"> {p.ceoMessageTitleMessage}</span>
+          </h2>
+          <section
+            className="relative overflow-hidden rounded-3xl border border-zinc-900/10 bg-transparent p-0 text-[#0f0f0f] sm:min-h-80"
+            aria-labelledby="ceo-message-title"
+          >
+            {/*
+              Figma 1200×480: 2열(텍스트 | 여백·캐릭터) — 그리드로 50% 텍스트 영역 고정, 배경 2x.
+            */}
+            <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+              <Image
+                src="/ceo_bg.webp"
+                alt=""
+                fill
+                className="object-cover object-[80%_center] md:object-right"
+                sizes={SIZES_FULL_1200}
+                quality={80}
+                priority
               />
-              <div className="pointer-events-none absolute left-0 right-0 top-0 z-[1] h-[min(132dvh,920px)] bg-gradient-to-b from-black/30 via-black/65 to-black/[0.93]" aria-hidden />
-              <div className="relative z-10 [&>section+section]:border-t [&>section+section]:border-white/10">
-                <div className="flex flex-col items-start px-6 pb-6 pt-[calc(env(safe-area-inset-top)+5.5rem+60px)] sm:px-10 sm:pb-8">
-                  <TpfMainHeading p={p} />
+            </div>
+            <div className="relative z-10 grid min-h-64 w-full [text-rendering:geometricPrecision] font-sans antialiased md:min-h-[480px] md:grid-cols-2">
+              <div className="hidden w-full min-w-0 max-w-full flex-col justify-center px-5 py-6 sm:px-7 sm:py-7 md:flex md:px-0 md:py-0 md:pl-[72px] md:pr-4 lg:pl-20">
+                <h2
+                  id="ceo-message-title"
+                  className="hidden text-left text-[32px] font-bold leading-10 tracking-[-0.02em] md:block"
+                >
+                  <span className="text-[#333333]">{p.ceoMessageTitleCeo}</span>
+                  <span className="text-[#B8B8B8]">
+                    {" "}
+                    {p.ceoMessageTitleMessage}
+                  </span>
+                </h2>
+                {/*
+                  본문: JSON에 수동 \n 없음·`whitespace-normal` — 너비는 박스(`max-w`)에 맞춰 자동 분기
+                */}
+                <div className="mt-8 w-full min-w-0 max-w-full sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,32rem)] lg:max-w-[min(100%,33rem)]">
+                  <CeoMessageRichText
+                    paragraphs={t.about.missionParagraphs}
+                    className="space-y-5"
+                    paragraphClassName="whitespace-normal break-keep break-words text-left text-[18px] font-normal leading-[1.75] text-[#333333] antialiased"
+                    strongClassName="font-bold text-[#333333]"
+                  />
                 </div>
-                <TpfMobileScrollBlock>
-                  <TpfOverviewContent p={p} mobile />
-                </TpfMobileScrollBlock>
-                <TpfMobileScrollBlock>
-                  <TpfAdvantagesContent p={p} mobile />
-                </TpfMobileScrollBlock>
-                <TpfMobileScrollBlock>
-                  <TpfResinContent p={p} mobile />
-                </TpfMobileScrollBlock>
-                <TpfMobileScrollBlock>
-                  <TpfMultiViaContent p={p} mobile />
-                </TpfMobileScrollBlock>
               </div>
+              <div className="hidden min-h-0 min-w-0 select-none md:block" aria-hidden />
             </div>
+          </section>
+          <div className="-mt-[26px] mb-[160px] md:hidden px-1">
+            <CeoMessageRichText
+              paragraphs={t.about.missionParagraphs}
+              className="space-y-5"
+              paragraphClassName="whitespace-normal break-keep break-words text-left text-[14px] font-normal leading-[1.75] text-zinc-100 antialiased"
+              strongClassName="font-bold text-white"
+            />
           </div>
-        </div>
 
-        {/* PC: 상단 제목 고정 + 그리드만 스크롤 */}
-        <div className="hidden min-h-0 flex-1 flex-col overflow-hidden lg:flex">
-          <div className="flex shrink-0 flex-col items-start justify-start px-5 pb-6 sm:px-6 sm:pb-8 lg:items-center lg:px-8 lg:pb-8 lg:pt-[120px] xl:px-12">
-            <TpfMainHeading p={p} />
-          </div>
-          {/* 상단부터 쌓기(`justify-start`) — 세로 중앙 정렬 시 하단 빈 여백이 과하게 보임 */}
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:justify-start">
-            {/* 스크롤 영역과 그리드 분리: 행을 뷰포트 높이로 늘리지 않고 `items-start`로 세 열 h3 상단선을 맞춤 */}
+          <div className="text-center">
+            <h2 className="mx-auto max-w-[52rem] bg-gradient-to-r from-[#dbe6ef] via-[#b9a8d6] to-[#9f8bc7] bg-clip-text text-balance break-keep text-2xl font-light leading-[1.35] tracking-wide text-transparent sm:text-[26px] md:text-[28px] lg:text-[30px]">
+              {p.title}
+            </h2>
             <div
-              className="mx-auto flex min-h-0 w-full flex-1 flex-col overflow-y-auto px-5 pt-4 pb-4 sm:px-8 sm:pt-5 sm:pb-5 lg:px-10 lg:pt-6 lg:pb-4 xl:px-14 xl:pt-7 xl:pb-5"
-              style={{ maxWidth: CONTENT_MAX }}
-            >
-              <div className="grid w-full grid-cols-3 items-start gap-8 sm:gap-10 lg:gap-12 xl:gap-16">
-                <article className="flex min-h-0 flex-col overflow-hidden lg:pl-8 lg:pr-4 xl:pl-12 xl:pr-6">
-                  <TextColumn>
-                    <TpfAdvantagesContent p={p} mobile={false} />
-                  </TextColumn>
-                </article>
+              className="mx-auto mt-5 h-px w-16 max-w-full bg-gradient-to-r from-violet-400/50 via-fuchsia-400/60 to-rose-300/50 sm:mt-6 sm:w-20"
+              aria-hidden
+            />
+          </div>
 
-                <article className="flex min-h-0 flex-col overflow-hidden lg:px-6 xl:px-8">
-                  <TextColumn>
-                    <TpfOverviewContent p={p} mobile={false} />
-                  </TextColumn>
-                </article>
-
-                <article className="flex min-h-0 flex-col overflow-hidden lg:pl-4 lg:pr-8 xl:pl-6 xl:pr-12">
-                  <TextColumn>
-                    <TpfResinContent p={p} mobile={false} />
-                    <div className="mt-[52px] sm:mt-[60px]">
-                      <TpfMultiViaContent p={p} mobile={false} />
-                    </div>
-                  </TextColumn>
-                </article>
+          <section
+            className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-800/45 p-6 sm:p-8"
+            aria-labelledby="tpf-overview-h"
+          >
+            <div className="grid items-start gap-8 md:grid-cols-2 md:gap-10 lg:gap-12">
+              <div className="flex w-full min-w-0 justify-center md:justify-start">
+                {/*
+                  1200/2 ≈ 560~600px 콘솔: pin.gif(2x 에셋)은 논리 너비 이하로 표시 → max-w-[35rem] = 560px
+                 */}
+                <div className="relative w-full max-w-[min(100%,35rem)]">
+                  <PinGifPlayer
+                    src="/pin.gif"
+                    alt={p.pinGifAlt}
+                    className="mx-auto h-auto w-full max-h-[min(50vh,18rem)] max-w-full object-contain sm:max-h-[min(48vh,20rem)]"
+                  />
+                  <div
+                    className="pointer-events-none absolute bottom-2 right-0 top-2 hidden w-px bg-zinc-400/45 md:block"
+                    aria-hidden
+                  />
+                </div>
+              </div>
+              <div className="min-w-0 self-center">
+                <h3 id="tpf-overview-h" className={tpfH3}>
+                  {p.overviewTitle}
+                </h3>
+                <ul className={`${tpfBody} mt-5 sm:mt-6`} aria-labelledby="tpf-overview-h">
+                  {p.overviewBullets.map((line, i) => (
+                    <li key={`ov-${i}`} className="whitespace-pre-line">
+                      {line}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-          </div>
+          </section>
+
+          <section
+            className="space-y-4 sm:space-y-5"
+            aria-labelledby="tpf-adv-h"
+          >
+            <h3 id="tpf-adv-h" className={tpfH3}>
+              {p.advantagesTitle}
+            </h3>
+            <TpfAdvantagesList p={p} />
+          </section>
+
+          <section
+            className="p-0"
+            aria-labelledby="tpf-resin-h"
+          >
+            <h3 id="tpf-resin-h" className={tpfH3}>
+              {p.resinTitle}
+            </h3>
+            <ul
+              className={`${tpfBody} mt-5 sm:mt-6`}
+              aria-labelledby="tpf-resin-h"
+            >
+              {p.resinBullets.map((line, i) => (
+                <li key={`resin-${i}`}>{line}</li>
+              ))}
+            </ul>
+            <div className="relative mx-auto mt-6 aspect-[1200/420] w-full overflow-hidden rounded-xl border border-white/10 sm:mt-8">
+              <div className="pointer-events-none absolute inset-0 opacity-10" aria-hidden>
+                <Image
+                  src="/box_bg.webp"
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes={SIZES_FULL_1200}
+                  quality={80}
+                />
+              </div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(100,100,120,0.12)_0%,transparent_55%)]" aria-hidden />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Image
+                  src="/tech01.webp"
+                  alt={p.tech01Alt}
+                  width={1200}
+                  height={420}
+                  className="h-auto w-3/5 object-contain"
+                  sizes="(max-width: 640px) 82vw, 50vw"
+                  quality={85}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="pb-4"
+            aria-labelledby="tpf-pin-h"
+          >
+            <h3 id="tpf-pin-h" className={tpfH3}>
+              {p.pinTitle}
+            </h3>
+            <ul
+              className={`${tpfBody} mt-5 sm:mt-6`}
+              aria-labelledby="tpf-pin-h"
+            >
+              {p.pinProcessBullets.map((line, i) => (
+                <li key={`pin-${i}`} className="whitespace-pre-line">
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
       </div>
     </div>

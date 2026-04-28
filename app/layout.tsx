@@ -1,6 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Noto_Sans_KR } from "next/font/google";
 import { I18nProvider } from "@/app/components/I18nProvider";
 import "./globals.css";
+
+const notoSansKr = Noto_Sans_KR({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-noto",
+});
 
 export const metadata: Metadata = {
   title: "U:RION — 상상을, 현실로",
@@ -20,7 +28,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#000000",
+  themeColor: "#222222",
   colorScheme: "dark",
   viewportFit: "cover",
 };
@@ -38,12 +46,12 @@ export default function RootLayout({
   return (
     <html
       lang={initialLocale}
-      className="min-h-dvh overflow-x-hidden font-sans antialiased"
+      className={`min-h-dvh overflow-x-hidden font-sans antialiased ${notoSansKr.variable}`}
     >
       <head>
         <meta name="referrer" content="strict-origin-when-cross-origin" />
       </head>
-      <body className="min-h-dvh overflow-x-hidden bg-black text-zinc-100 antialiased">
+      <body className="min-h-dvh overflow-x-hidden bg-landing-page text-zinc-100 antialiased">
         <I18nProvider initialLocale={initialLocale}>
           {children}
           {modal}

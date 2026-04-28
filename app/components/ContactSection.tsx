@@ -300,7 +300,7 @@ export function ContactSection({
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="mt-2 inline-flex min-h-12 w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-base font-semibold leading-normal text-white shadow-lg shadow-violet-950/40 transition-[filter,transform] hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:pointer-events-none disabled:opacity-60"
+                className="mt-2 inline-flex min-h-12 w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-3 text-base font-semibold leading-normal text-white shadow-lg shadow-violet-950/40 transition-[filter,transform] hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-landing-page disabled:pointer-events-none disabled:opacity-60"
               >
                 {status === "loading" ? t.contact.submitting : t.contact.submit}
               </button>

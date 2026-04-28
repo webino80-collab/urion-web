@@ -1,5 +1,8 @@
 import type { Locale } from "./locale";
 
+/** CEO 소개 문단 — Figma는 일부 강조(Noto 18px, strong=볼드) */
+export type CeoMessagePart = { text: string; strong?: boolean };
+
 export type Messages = {
   landing: {
     about: string;
@@ -19,8 +22,8 @@ export type Messages = {
     ctaContact: string;
   };
   about: {
-    /** CEO 소개 — 한글 문단 (줄바꿈은 배열 요소로 구분) */
-    missionKoParagraphs: string[];
+    /** CEO 소개(랜딩/오버레이) — `strong` true 구간이 본문 볼드 */
+    missionParagraphs: CeoMessagePart[][];
     ceoAlt: string;
     close: string;
     closeAria: string;
@@ -59,6 +62,9 @@ export type Messages = {
   /** 랜딩 2번째 풀페이지: TPF 정밀 제조 (1920×1080 기준 3열) */
   tpf: {
     ariaLabel: string;
+    /** 랜딩 CEO Message 제목: `CEO` #333, `Message` #B8B8B8 */
+    ceoMessageTitleCeo: string;
+    ceoMessageTitleMessage: string;
     title: string;
     /** 가운데 열: 제목 */
     overviewTitle: string;
@@ -93,9 +99,18 @@ const ko: Messages = {
     ctaContact: "지금 문의하기",
   },
   about: {
-    missionKoParagraphs: [
-      "(주)유리온의 이성재 대표이사는 한국화학연구원, 삼성전기,\n와이엠티를 거쳤으며 40여 년 이상 반도체 패키징 분야에서 연구 및 개발을 해왔습니다.",
-      "유리 기판 TGV의 혁신적인 기술을 개발했으며, 반도체 패키징의 미래 발전을 위한 선봉장이 될 것입니다.",
+    missionParagraphs: [
+      [
+        {
+          text: "(주)유리온의 이성재 대표이사는 한국화학연구원, 삼성전기, 와이엠티를 거쳤으며 40여 년 이상 ",
+        },
+        { text: "반도체 패키징 분야", strong: true },
+        { text: "에서 연구 및 개발을 해왔습니다." },
+      ],
+      [
+        { text: "유리 기판 TGV의 혁신적인 기술을 개발", strong: true },
+        { text: "했으며, 반도체 패키징의 미래 발전을 위한 선봉장이 될 것입니다." },
+      ],
     ],
     ceoAlt: "유리온 대표",
     close: "닫기",
@@ -136,6 +151,8 @@ const ko: Messages = {
   },
   tpf: {
     ariaLabel: "TPF 정밀 제조 프로세스",
+    ceoMessageTitleCeo: "CEO",
+    ceoMessageTitleMessage: "Message",
     title:
       "유리 기판 관통 전극(Through Glass Via)의 혁신적인 기술로 유리 기판의 새로운 시대를 열어갑니다.",
     overviewTitle: "TPF(TGV Pin Fill) 기술의 개요",
@@ -161,12 +178,9 @@ const ko: Messages = {
         ],
       },
       {
-        heading:
-          "TGV 도금 방식과 비교해서 높은 공정 수율과 양산성 확보가 가능합니다.",
+        heading: "도금시 발생하는 불량 문제가 없습니다.",
         subpoints: [
-          "도금 불균일 및 Void 발생 문제 없음",
-          "홀 막힘 문제가 발생하지 않음",
-          "유리와 금속의 접착력 문제가 발생하지 않음",
+          "도금 불균일, Void, 홀 막힘 등 품질 이슈를 구조적으로 회피",
         ],
       },
       {
@@ -178,8 +192,8 @@ const ko: Messages = {
         heading:
           "TGV 도금 방식과 비교해서 높은 공정 수율과 양산성 확보가 가능합니다.",
         subpoints: [
-          "도금 대비 높은 수율 및 양산성 가능",
-          "도금 대비 낮은 공정비용",
+          "도금 대비 높은 수율·양산성·낮은 공정비용",
+          "유리와 금속의 접착력 이슈 최소화",
         ],
       },
     ],
@@ -212,9 +226,24 @@ const en: Messages = {
     ctaContact: "Get in touch",
   },
   about: {
-    missionKoParagraphs: [
-      "(주)유리온의 이성재 대표이사는 한국화학연구원, 삼성전기,\n와이엠티를 거쳤으며 40여 년 이상 반도체 패키징 분야에서 연구 및 개발을 해왔습니다.",
-      "유리 기판 TGV의 혁신적인 기술을 개발했으며, 반도체 패키징의 미래 발전을 위한 선봉장이 될 것입니다.",
+    missionParagraphs: [
+      [
+        {
+          text: "U:RION’s CEO, Lee, worked at the Korea Research Institute of Chemical Technology, Samsung Electro-Mechanics, and YMT, and for over 40 years has been researching and developing in the ",
+        },
+        { text: "semiconductor packaging", strong: true },
+        { text: " field." },
+      ],
+      [
+        { text: "U:RION has developed " },
+        {
+          text: "innovative glass-substrate TGV technology",
+          strong: true,
+        },
+        {
+          text: ", and will be at the forefront of semiconductor packaging’s next chapter.",
+        },
+      ],
     ],
     ceoAlt: "U:RION leadership",
     close: "Close",
@@ -255,7 +284,10 @@ const en: Messages = {
   },
   tpf: {
     ariaLabel: "TPF precision manufacturing process",
-    title: "Precision Manufacturing Process",
+    ceoMessageTitleCeo: "CEO",
+    ceoMessageTitleMessage: "Message",
+    title:
+      "Through Glass Via (TGV) innovation is opening a new era for glass substrates.",
     overviewTitle: "TPF (TGV Pin Fill) technology overview",
     overviewBullets: [
       "Conventional TGV (Through Glass Via) processes fill vias with copper using electroplating.",
@@ -279,12 +311,9 @@ const en: Messages = {
         ],
       },
       {
-        heading:
-          "Compared with TGV plating, higher process yield and mass-production scalability are achievable.",
+        heading: "No typical plating-related defect modes.",
         subpoints: [
-          "No non-uniform plating or void formation",
-          "No blocked-hole issues",
-          "No glass–metal adhesion failures",
+          "Structurally avoids non-uniform plating, voids, and blocked vias",
         ],
       },
       {
@@ -296,8 +325,8 @@ const en: Messages = {
         heading:
           "Compared with TGV plating, higher process yield and mass-production scalability are achievable.",
         subpoints: [
-          "Higher yield and mass-production potential versus plating",
-          "Lower process cost than plating",
+          "Higher yield, scalability, and lower process cost than plating",
+          "Reduced glass–metal adhesion risk",
         ],
       },
     ],

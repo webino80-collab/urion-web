@@ -4,6 +4,31 @@ import { useEffect, useRef } from "react";
 import { decompressFrames, parseGIF, type ParsedFrame } from "gifuct-js";
 
 const PAUSE_MS = 1000;
+const BLACK_KEY_THRESHOLD = 26;
+
+/**
+ * 원본 GIF가 검은 배경으로 인코딩된 경우, 랜딩 다크 배경 위에서 배경만 투명화.
+ * (완전 검정 + 근접 어두운 픽셀을 알파 0으로 처리)
+ */
+function removeBlackBackground(imageData: ImageData): ImageData {
+  const out = new ImageData(
+    new Uint8ClampedArray(imageData.data),
+    imageData.width,
+    imageData.height,
+  );
+  const data = out.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+    if (a === 0) continue;
+    if (r <= BLACK_KEY_THRESHOLD && g <= BLACK_KEY_THRESHOLD && b <= BLACK_KEY_THRESHOLD) {
+      data[i + 3] = 0;
+    }
+  }
+  return out;
+}
 
 function drawPatch(
   gifCtx: CanvasRenderingContext2D,
@@ -54,7 +79,7 @@ function buildSnapshots(
       if (i > 0) applyDisposal(gifCtx, frames[i - 1]);
       drawPatch(gifCtx, tempCanvas, tempCtx, frames[i]);
     }
-    snaps.push(gifCtx.getImageData(0, 0, width, height));
+    snaps.push(removeBlackBackground(gifCtx.getImageData(0, 0, width, height)));
   }
   return snaps;
 }
